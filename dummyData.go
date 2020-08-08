@@ -1,8 +1,6 @@
 package main
 
 import (
-	"net/http"
-
 	Models "github.com/sumaikun/apeslogistic-rest-api/models"
 )
 
@@ -48,20 +46,4 @@ var issues = allIssues{
 		Participant: "Unibán",
 		Description: "Activo de cargamento de fruta Unibán",
 	},
-}
-
-type allAssets []Models.Assets
-
-var assets = allAssets{}
-
-func getParticipants(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func getAssets(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func getIssues(w http.ResponseWriter, r *http.Request) {
-
 }

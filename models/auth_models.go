@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Credentials is the request body of credential input
@@ -26,4 +27,5 @@ type Claims struct {
 // TokenResponse represents json response after succesfully auth
 type TokenResponse struct {
 	Token string `json:"token"`
+	User  bson.M `json:"user"`
 }

@@ -1,2 +1,4 @@
-port = "8092"
+port = "8096"
 jwtKey = ":://%%··$·$FDSFSDSsassfvv"
+server = "localhost:27017"
+database = "apesLogistic"
