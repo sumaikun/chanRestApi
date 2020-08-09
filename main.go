@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/chainHero/heroes-service/blockchain"
 	"github.com/gorilla/mux"
 	Config "github.com/sumaikun/apeslogistic-rest-api/config"
 	Dao "github.com/sumaikun/apeslogistic-rest-api/dao"
@@ -61,6 +63,67 @@ func (c *CORSRouterDecorator) ServeHTTP(rw http.ResponseWriter, req *http.Reques
 
 func main() {
 
+	fSetup := blockchain.FabricSetup{
+		// Network parameters
+		OrdererID: "orderer.hf.chainhero.io",
+
+		// Channel parameters
+		ChannelID:     "chainhero",
+		ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/chainHero/heroes-service/fixtures/artifacts/chainhero.channel.tx",
+
+		// Chaincode parameters
+		ChainCodeID:     "heroes-service",
+		ChaincodeGoPath: os.Getenv("GOPATH"),
+		ChaincodePath:   "github.com/chainHero/heroes-service/chaincode/",
+		OrgAdmin:        "Admin",
+		OrgName:         "org1",
+		ConfigFile:      "config.yaml",
+
+		// User parameters
+		UserName: "User1",
+	}
+
+	err := fSetup.Initialize()
+	if err != nil {
+		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
+		return
+	}
+	// Close SDK
+	defer fSetup.CloseSDK()
+
+	// Install and instantiate the chaincode
+	err = fSetup.InstallAndInstantiateCC()
+	if err != nil {
+		fmt.Printf("Unable to install and instantiate the chaincode: %v\n", err)
+		return
+	}
+
+	// Query the chaincode
+	response, err := fSetup.QueryHello()
+	if err != nil {
+		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Response from the query hello: %s\n", response)
+	}
+
+	// Invoke the chaincode
+	txId, err := fSetup.InvokeHello("apeslogistic")
+	if err != nil {
+		fmt.Printf("Unable to invoke hello on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Successfully invoke hello, transaction ID: %s\n", txId)
+	}
+
+	// Query again the chaincode
+	response, err = fSetup.QueryHello()
+	if err != nil {
+		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Response from the query hello: %s\n", response)
+	}
+
+	fmt.Printf("finish")
+
 	fmt.Println("start server in port " + port)
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -83,13 +146,13 @@ func main() {
 	router.Handle("/downloadFile/{file}", middleware.AuthMiddleware(http.HandlerFunc(downloadFile))).Methods("GET")
 
 	/* Participants */
-	router.HandleFunc("/participants", authentication).Methods("GET")
+	//router.HandleFunc("/participants", authentication).Methods("GET")
 
 	/* Assets */
-	router.HandleFunc("/assets", authentication).Methods("GET")
+	//router.HandleFunc("/assets", authentication).Methods("GET")
 
 	/* ISSUES */
-	router.HandleFunc("/issues", authentication).Methods("GET")
+	//router.HandleFunc("/issues", authentication).Methods("GET")
 
 	/* TRAZABILITY */
 	//router.HandleFunc("/traz/{id}", authentication).Methods("GET")
