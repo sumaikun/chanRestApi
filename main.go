@@ -20,7 +20,28 @@ var (
 
 var dao = Dao.MongoConnector{}
 
+var fSetup = blockchain.FabricSetup{
+	// Network parameters
+	OrdererID: "orderer.hf.chainhero.io",
+
+	// Channel parameters
+	ChannelID:     "chainhero",
+	ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/chainHero/heroes-service/fixtures/artifacts/chainhero.channel.tx",
+
+	// Chaincode parameters
+	ChainCodeID:     "heroes-service",
+	ChaincodeGoPath: os.Getenv("GOPATH"),
+	ChaincodePath:   "github.com/chainHero/heroes-service/chaincode/",
+	OrgAdmin:        "Admin",
+	OrgName:         "org1",
+	ConfigFile:      "config.yaml",
+
+	// User parameters
+	UserName: "User1",
+}
+
 func init() {
+
 	var config = Config.Config{}
 	config.Read()
 	//fmt.Println(config.Jwtkey)
@@ -30,6 +51,24 @@ func init() {
 	dao.Server = config.Server
 	dao.Database = config.Database
 	dao.Connect()
+
+	err := fSetup.Initialize()
+	if err != nil {
+		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
+		return
+	}
+	// Close SDK
+	defer fSetup.CloseSDK()
+
+	// Install and instantiate the chaincode
+	err = fSetup.InstallAndInstantiateCC()
+	if err != nil {
+		fmt.Printf("Unable to install and instantiate the chaincode: %v\n", err)
+		return
+	}
+
+	fmt.Printf("finish chaincode declaration")
+
 }
 
 // CORSRouterDecorator applies CORS headers to a mux.Router
@@ -62,43 +101,6 @@ func (c *CORSRouterDecorator) ServeHTTP(rw http.ResponseWriter, req *http.Reques
 //-------------------
 
 func main() {
-
-	fSetup := blockchain.FabricSetup{
-		// Network parameters
-		OrdererID: "orderer.hf.chainhero.io",
-
-		// Channel parameters
-		ChannelID:     "chainhero",
-		ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/chainHero/heroes-service/fixtures/artifacts/chainhero.channel.tx",
-
-		// Chaincode parameters
-		ChainCodeID:     "heroes-service",
-		ChaincodeGoPath: os.Getenv("GOPATH"),
-		ChaincodePath:   "github.com/chainHero/heroes-service/chaincode/",
-		OrgAdmin:        "Admin",
-		OrgName:         "org1",
-		ConfigFile:      "config.yaml",
-
-		// User parameters
-		UserName: "User1",
-	}
-
-	err := fSetup.Initialize()
-	if err != nil {
-		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
-		return
-	}
-	// Close SDK
-	defer fSetup.CloseSDK()
-
-	// Install and instantiate the chaincode
-	err = fSetup.InstallAndInstantiateCC()
-	if err != nil {
-		fmt.Printf("Unable to install and instantiate the chaincode: %v\n", err)
-		return
-	}
-
-	fmt.Printf("finish chaincode declaration")
 
 	fmt.Println("start server in port " + port)
 	router := mux.NewRouter().StrictSlash(true)
