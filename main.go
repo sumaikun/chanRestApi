@@ -98,31 +98,7 @@ func main() {
 		return
 	}
 
-	// Query the chaincode
-	response, err := fSetup.QueryHello()
-	if err != nil {
-		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
-	} else {
-		fmt.Printf("Response from the query hello: %s\n", response)
-	}
-
-	// Invoke the chaincode
-	txId, err := fSetup.InvokeHello("apeslogistic")
-	if err != nil {
-		fmt.Printf("Unable to invoke hello on the chaincode: %v\n", err)
-	} else {
-		fmt.Printf("Successfully invoke hello, transaction ID: %s\n", txId)
-	}
-
-	// Query again the chaincode
-	response, err = fSetup.QueryHello()
-	if err != nil {
-		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
-	} else {
-		fmt.Printf("Response from the query hello: %s\n", response)
-	}
-
-	fmt.Printf("finish")
+	fmt.Printf("finish chaincode declaration")
 
 	fmt.Println("start server in port " + port)
 	router := mux.NewRouter().StrictSlash(true)
@@ -144,6 +120,10 @@ func main() {
 	router.HandleFunc("/serveImage/{image}", serveImage).Methods("GET")
 	router.Handle("/deleteFile/{file}", middleware.AuthMiddleware(http.HandlerFunc(deleteImage))).Methods("DELETE")
 	router.Handle("/downloadFile/{file}", middleware.AuthMiddleware(http.HandlerFunc(downloadFile))).Methods("GET")
+
+	/* testing chaincode */
+	router.HandleFunc("/queryHelloChainCode", queryHelloChainCode).Methods("GET")
+	router.HandleFunc("/invokeHelloChaincode", invokeHelloChaincode).Methods("POST")
 
 	/* Participants */
 	//router.HandleFunc("/participants", authentication).Methods("GET")

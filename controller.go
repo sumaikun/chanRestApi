@@ -407,3 +407,30 @@ func getFileContentType(out *os.File) (string, error) {
 
 	return contentType, nil
 }
+
+//-----------------------------  Hello chaincode --------------------------------------------------
+
+func queryHelloChainCode(w http.ResponseWriter, r *http.Request) {
+	// Query the chaincode
+	response, err := fSetup.QueryHello()
+	if err != nil {
+		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Response from the query hello: %s\n", response)
+		Helpers.RespondWithJSON(w, http.StatusOK, response)
+	}
+}
+
+func invokeHelloChaincode(w http.ResponseWriter, r *http.Request) {
+
+	defer r.Body.Close()
+
+	// Invoke the chaincode
+	txId, err := fSetup.InvokeHello("apeslogistic")
+	if err != nil {
+		fmt.Printf("Unable to invoke hello on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Successfully invoke hello, transaction ID: %s\n", txId)
+		Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": "ok"})
+	}
+}
