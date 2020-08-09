@@ -56,27 +56,6 @@ func init() {
 	dao.Database = config.Database
 	dao.Connect()
 
-	err := fSetup.Initialize()
-	if err != nil {
-		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
-		return
-	}
-	// Close SDK
-	defer fSetup.CloseSDK()
-
-	// Install and instantiate the chaincode
-	err = fSetup.InstallAndInstantiateCC()
-	if err != nil {
-		fmt.Printf("Unable to install and instantiate the chaincode: %v\n", err)
-		return
-	}
-
-	app := Application{
-		Fabric: &fSetup,
-	}
-
-	fmt.Printf("finish chaincode declaration")
-
 }
 
 // CORSRouterDecorator applies CORS headers to a mux.Router
@@ -110,6 +89,27 @@ func (c *CORSRouterDecorator) ServeHTTP(rw http.ResponseWriter, req *http.Reques
 
 func main() {
 
+	err := fSetup.Initialize()
+	if err != nil {
+		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
+		return
+	}
+	// Close SDK
+	defer fSetup.CloseSDK()
+
+	// Install and instantiate the chaincode
+	err = fSetup.InstallAndInstantiateCC()
+	if err != nil {
+		fmt.Printf("Unable to install and instantiate the chaincode: %v\n", err)
+		return
+	}
+
+	app := Application{
+		Fabric: &fSetup,
+	}
+
+	fmt.Println("finish chaincode declaration")
+
 	fmt.Println("start server in port " + port)
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -132,8 +132,8 @@ func main() {
 	router.Handle("/downloadFile/{file}", middleware.AuthMiddleware(http.HandlerFunc(downloadFile))).Methods("GET")
 
 	/* testing chaincode */
-	router.HandleFunc("/queryHelloChainCode", queryHelloChainCode).Methods("GET")
-	router.HandleFunc("/invokeHelloChaincode", invokeHelloChaincode).Methods("POST")
+	http.HandleFunc("/queryHelloChainCode", queryHelloChainCode).Methods("GET")
+	http.HandleFunc("/invokeHelloChaincode", invokeHelloChaincode).Methods("POST")
 
 	/* Participants */
 	//router.HandleFunc("/participants", authentication).Methods("GET")
