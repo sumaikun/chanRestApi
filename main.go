@@ -52,23 +52,6 @@ func init() {
 	dao.Database = config.Database
 	dao.Connect()
 
-	err := fSetup.Initialize()
-	if err != nil {
-		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
-		return
-	}
-	// Close SDK
-	defer fSetup.CloseSDK()
-
-	// Install and instantiate the chaincode
-	err = fSetup.InstallAndInstantiateCC()
-	if err != nil {
-		fmt.Printf("Unable to install and instantiate the chaincode: %v\n", err)
-		return
-	}
-
-	fmt.Printf("finish chaincode declaration")
-
 }
 
 // CORSRouterDecorator applies CORS headers to a mux.Router
@@ -101,6 +84,23 @@ func (c *CORSRouterDecorator) ServeHTTP(rw http.ResponseWriter, req *http.Reques
 //-------------------
 
 func main() {
+
+	err := fSetup.Initialize()
+	if err != nil {
+		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
+		return
+	}
+	// Close SDK
+	defer fSetup.CloseSDK()
+
+	// Install and instantiate the chaincode
+	err = fSetup.InstallAndInstantiateCC()
+	if err != nil {
+		fmt.Printf("Unable to install and instantiate the chaincode: %v\n", err)
+		return
+	}
+
+	fmt.Printf("finish chaincode declaration")
 
 	fmt.Println("start server in port " + port)
 	router := mux.NewRouter().StrictSlash(true)
