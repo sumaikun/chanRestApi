@@ -411,10 +411,20 @@ func getFileContentType(out *os.File) (string, error) {
 //-----------------------------  Hello chaincode --------------------------------------------------
 
 func queryHelloChainCode(w http.ResponseWriter, r *http.Request) {
+	err := fSetup.Initialize()
+	if err != nil {
+		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
+		return
+	}
+	// Close SDK
+	defer fSetup.CloseSDK()
 	// Query the chaincode
 	response, err := fSetup.QueryHello()
 	if err != nil {
 		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
+		return
 	} else {
 		fmt.Printf("Response from the query hello: %s\n", response)
 		Helpers.RespondWithJSON(w, http.StatusOK, response)
