@@ -58,7 +58,7 @@ func init() {
 		return
 	}
 	// Close SDK
-	defer fSetup.CloseSDK()
+	//defer fSetup.CloseSDK()
 
 	// Install and instantiate the chaincode
 	err = fSetup.InstallAndInstantiateCC()
