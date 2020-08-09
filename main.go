@@ -132,8 +132,8 @@ func main() {
 	router.Handle("/downloadFile/{file}", middleware.AuthMiddleware(http.HandlerFunc(downloadFile))).Methods("GET")
 
 	/* testing chaincode */
-	router.Handle("/queryHelloChainCode", queryHelloChainCode).Methods("GET")
-	router.Handle("/invokeHelloChaincode", invokeHelloChaincode).Methods("POST")
+	router.Handle("/queryHelloChainCode", app.queryHelloChainCode).Methods("GET")
+	router.Handle("/invokeHelloChaincode", app.invokeHelloChaincode).Methods("POST")
 
 	/* Participants */
 	//router.HandleFunc("/participants", authentication).Methods("GET")
