@@ -7,7 +7,7 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 )
 
-// InvokeHello
+// HistoryHello method example
 func (setup *FabricSetup) HistoryHello() (string, error) {
 
 	// Prepare arguments
@@ -16,31 +16,10 @@ func (setup *FabricSetup) HistoryHello() (string, error) {
 	args = append(args, "history")
 	args = append(args, "hello")
 
-	eventID := "eventHistory"
-
-	// Add data that will be visible in the proposal, like a description of the invoke request
-	transientDataMap := make(map[string][]byte)
-	transientDataMap["result"] = []byte("Transient data in hello history")
-
-	reg, notifier, err := setup.event.RegisterChaincodeEvent(setup.ChainCodeID, eventID)
+	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2])}})
 	if err != nil {
-		return "", err
-	}
-	defer setup.event.Unregister(reg)
-
-	// Create a request (proposal) and send it
-	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3])}, TransientMap: transientDataMap})
-	if err != nil {
-		return "", fmt.Errorf("failed to move funds: %v", err)
+		return "", fmt.Errorf("failed to query: %v", err)
 	}
 
-	// Wait for the result of the submission
-	select {
-	case ccEvent := <-notifier:
-		fmt.Printf("Received CC event: %s\n", ccEvent)
-	case <-time.After(time.Second * 20):
-		return "", fmt.Errorf("did NOT receive CC event for eventId(%s)", eventID)
-	}
-
-	return string(response.TransactionID), nil
+	return string(response.Payload), nil
 }
