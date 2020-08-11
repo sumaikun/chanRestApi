@@ -427,10 +427,16 @@ func (app *Application) queryHelloChainCode(w http.ResponseWriter, r *http.Reque
 
 func (app *Application) invokeHelloChaincode(w http.ResponseWriter, r *http.Request) {
 
+	params := mux.Vars(r)
+
+	if params["word"] == nil {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param word needed"})
+	}
+
 	defer r.Body.Close()
 
 	// Invoke the chaincode
-	txID, err := app.Fabric.InvokeHello("apeslogistic")
+	txID, err := app.Fabric.InvokeHello(params["word"])
 	if err != nil {
 		fmt.Printf("Unable to invoke hello on the chaincode: %v\n", err)
 		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)

@@ -133,7 +133,7 @@ func main() {
 
 	/* testing chaincode */
 	router.HandleFunc("/queryHelloChainCode", app.queryHelloChainCode).Methods("GET")
-	router.HandleFunc("/invokeHelloChainCode", app.invokeHelloChaincode).Methods("GET")
+	router.HandleFunc("/invokeHelloChainCode/{word}", app.invokeHelloChaincode).Methods("GET")
 
 	/* Participants */
 	//router.HandleFunc("/participants", authentication).Methods("GET")
