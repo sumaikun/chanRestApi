@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"encoding/gob"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
@@ -461,6 +463,9 @@ func (app *Application) historyHelloChainCode(w http.ResponseWriter, r *http.Req
 	}
 
 	fmt.Printf("Response from the history hello: %s\n", response)
-	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": response})
+	strs2 := []string{}
+	gob.NewDecoder(response).Decode(&strs2)
+	fmt.Printf("%v", strs2)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": strs2})
 
 }
