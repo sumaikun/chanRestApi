@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/gob"
 	"fmt"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -190,15 +188,7 @@ func (t *HeroesServiceChaincode) history(stub shim.ChaincodeStubInterface, args 
 			historyData = append(historyData, string(modification.Value))
 		}
 
-		fmt.Println("historyData")
-
-		fmt.Println(historyData)
-
-		buf := &bytes.Buffer{}
-		gob.NewEncoder(buf).Encode(historyData)
-		bs := buf.Bytes()
-
-		return shim.Success(bs)
+		return shim.Success(historyData)
 	}
 
 	// If the arguments given don’t match any function, we return an error

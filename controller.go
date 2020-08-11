@@ -12,8 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"encoding/gob"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
@@ -452,8 +450,6 @@ func (app *Application) invokeHelloChaincode(w http.ResponseWriter, r *http.Requ
 func (app *Application) historyHelloChainCode(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
-	fmt.Println("history chaincode function")
-
 	// Invoke the chaincode
 	response, err := app.Fabric.HistoryHello()
 	if err != nil {
@@ -463,9 +459,7 @@ func (app *Application) historyHelloChainCode(w http.ResponseWriter, r *http.Req
 	}
 
 	fmt.Printf("Response from the history hello: %s\n", response)
-	strs2 := []string{}
-	gob.NewDecoder(response).Decode(&strs2)
-	fmt.Printf("%v", strs2)
-	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": strs2})
+
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": response})
 
 }
