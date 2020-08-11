@@ -167,6 +167,8 @@ func (t *HeroesServiceChaincode) history(stub shim.ChaincodeStubInterface, args 
 
 		key := "hello"
 
+		historyData := []string{}
+
 		historyIter, err := stub.GetHistoryForKey(key)
 
 		if err != nil {
@@ -183,7 +185,12 @@ func (t *HeroesServiceChaincode) history(stub shim.ChaincodeStubInterface, args 
 				return shim.Error(errMsg)
 			}
 			fmt.Println("Returning information about", string(modification.Value))
+			historyData = append(historyData, string(modification.Value))
 		}
+
+		fmt.Println("historyData")
+
+		fmt.Println(historyData)
 
 		return shim.Success([]byte("done"))
 	}
