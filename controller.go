@@ -421,7 +421,7 @@ func (app *Application) queryHelloChainCode(w http.ResponseWriter, r *http.Reque
 	}
 
 	fmt.Printf("Response from the query hello: %s\n", response)
-	Helpers.RespondWithJSON(w, http.StatusOK, response)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": response})
 
 }
 
