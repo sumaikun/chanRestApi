@@ -446,3 +446,18 @@ func (app *Application) invokeHelloChaincode(w http.ResponseWriter, r *http.Requ
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
 
 }
+
+func (app *Application) historyHelloChainCode(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	// Invoke the chaincode
+	txID, err := app.Fabric.HistoryHello()
+	if err != nil {
+		fmt.Printf("Unable to history hello on the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
+		return
+	}
+	fmt.Printf("Successfully history hello, transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
