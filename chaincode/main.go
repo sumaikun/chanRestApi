@@ -189,7 +189,7 @@ func (t *HeroesServiceChaincode) history(stub shim.ChaincodeStubInterface, args 
 			historyData = append(historyData, string(modification.Value))
 		}
 
-		historyAsString = strings.Join(historyData, ",")
+		historyAsString := strings.Join(historyData, ",")
 
 		return shim.Success([]byte("[" + historyAsString + "]"))
 	}
