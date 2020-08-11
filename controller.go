@@ -429,7 +429,7 @@ func (app *Application) invokeHelloChaincode(w http.ResponseWriter, r *http.Requ
 
 	params := mux.Vars(r)
 
-	if params["word"] == nil {
+	if len(params["word"]) == 0 {
 		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param word needed"})
 	}
 
