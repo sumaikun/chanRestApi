@@ -6,13 +6,15 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/chainHero/heroes-service/blockchain"
+	//"github.com/chainHero/heroes-service/blockchain"
 	"github.com/gorilla/mux"
+	"github.com/sumaikun/apeslogistic-rest-api/blockchain"
 	Config "github.com/sumaikun/apeslogistic-rest-api/config"
 	Dao "github.com/sumaikun/apeslogistic-rest-api/dao"
 	middleware "github.com/sumaikun/apeslogistic-rest-api/middlewares"
 )
 
+//Application object to chaincode connection
 type Application struct {
 	Fabric *blockchain.FabricSetup
 }
@@ -134,6 +136,7 @@ func main() {
 	/* testing chaincode */
 	router.HandleFunc("/queryHelloChainCode", app.queryHelloChainCode).Methods("GET")
 	router.HandleFunc("/invokeHelloChainCode/{word}", app.invokeHelloChaincode).Methods("GET")
+	router.HandleFunc("/historyHelloChainCode", app.queryHelloChainCode).Methods("GET")
 
 	/* Participants */
 	//router.HandleFunc("/participants", authentication).Methods("GET")
