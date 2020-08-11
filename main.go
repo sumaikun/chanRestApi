@@ -37,7 +37,7 @@ var fSetup = blockchain.FabricSetup{
 	// Chaincode parameters
 	ChainCodeID:     "heroes-service",
 	ChaincodeGoPath: os.Getenv("GOPATH"),
-	ChaincodePath:   "github.com/chainHero/heroes-service/chaincode/",
+	ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/chaincode/",
 	OrgAdmin:        "Admin",
 	OrgName:         "org1",
 	ConfigFile:      "config.yaml",
