@@ -23,7 +23,7 @@ func (t *ApesChainCode) getData(stub shim.ChaincodeStubInterface, args []string)
 		jsonResp = "{\"Error\":\"Failed to get state for " + key + "\"}"
 		return shim.Error(jsonResp)
 	} else if valAsbytes == nil {
-		jsonResp = "{\"Error\":\"Marble does not exist: " + key + "\"}"
+		jsonResp = "{\"Error\":\"Key does not exist: " + key + "\"}"
 		return shim.Error(jsonResp)
 	}
 

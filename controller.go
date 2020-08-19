@@ -477,7 +477,7 @@ func (app *Application) getDataFromChaincode(w http.ResponseWriter, r *http.Requ
 	response, err := app.Fabric.QueryGetData(params["key"])
 	if err != nil {
 		fmt.Printf("Unable to query  the chaincode: %v\n", err)
-		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err})
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
 		return
 	}
 
@@ -500,11 +500,11 @@ func (app *Application) createParticipant(w http.ResponseWriter, r *http.Request
 	// Invoke the chaincode
 	txID, err2 := app.Fabric.CreateParticipant(participant)
 	if err2 != nil {
-		fmt.Printf("Unable to invoke hello on the chaincode: %v\n", err)
-		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
+		fmt.Printf("Unable to create participant on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
 		return
 	}
-	fmt.Printf("Successfully invoke hello, transaction ID: %s\n", txID)
+	fmt.Printf("Successfully create participant transaction ID: %s\n", txID)
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
 
 }
