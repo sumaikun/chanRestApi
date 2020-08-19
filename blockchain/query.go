@@ -34,7 +34,7 @@ func (setup *FabricSetup) QueryGetData(key string) (string, error) {
 	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1])}})
 	if err != nil {
 		fmt.Errorf("failed to query: %v", err)
-		return "", err
+		return "", map[string]interface{}{"failed to query": err}
 	}
 
 	return string(response.Payload), nil
