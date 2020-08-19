@@ -32,6 +32,52 @@ func (t *ApesChainCode) getData(stub shim.ChaincodeStubInterface, args []string)
 
 }
 
+func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	fmt.Println("########### ApesChainCode get Object Type results ###########")
+
+	var objectType string
+	var err error
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting objectType to query")
+	}
+
+	objectType = args[0]
+
+	resultsIterator, err := stub.GetStateByPartialCompositeKey("type~identification", []string{objectType})
+
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	defer resultsIterator.Close()
+
+	var i int
+	for i = 0; resultsIterator.HasNext(); i++ {
+
+		responseRange, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		// get the color and name from color~name composite key
+		type, compositeKeyParts, err := stub.SplitCompositeKey(responseRange.Key)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		returnedType := compositeKeyParts[0]
+		returnedId := compositeKeyParts[1]
+
+		fmt.Println(type)
+
+		fmt.Println(returnedType)
+
+		fmt.Println(returnedId)
+
+	}
+
+}
+
 /********************************** only works with couch db ***********************************/
 
 func (t *ApesChainCode) getObjectType(stub shim.ChaincodeStubInterface, args []string) pb.Response {
