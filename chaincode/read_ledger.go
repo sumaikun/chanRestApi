@@ -34,7 +34,7 @@ func (t *ApesChainCode) query(stub shim.ChaincodeStubInterface, args []string) p
 	//fmt.Println(stub.GetTransient())
 
 	// Check whether the number of arguments is sufficient
-	if len(args) < 2 {
+	if len(args) < 1 {
 		return shim.Error("The number of arguments is insufficient.")
 	}
 
@@ -53,7 +53,7 @@ func (t *ApesChainCode) query(stub shim.ChaincodeStubInterface, args []string) p
 	}
 
 	// If the arguments given don’t match any function, we return an error
-	return shim.Error("Unknown query action, check the second argument.")
+	return shim.Error("Unknown query action, check the  argument.")
 }
 
 func (t *ApesChainCode) history(stub shim.ChaincodeStubInterface, args []string) pb.Response {
