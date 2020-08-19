@@ -35,7 +35,7 @@ func (t *ApesChainCode) getData(stub shim.ChaincodeStubInterface, args []string)
 func (t *ApesChainCode) getObjectType(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	fmt.Println("########### ApesChainCode get Object Type results ###########")
 
-	var objectType, jsonResp string
+	var objectType
 	var err error
 
 	if len(args) != 1 {
