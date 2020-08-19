@@ -5,8 +5,11 @@ import (
 	"time"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"github.com/pkg/errors"
 
 	Models "github.com/sumaikun/apeslogistic-rest-api/models"
+
+	"errors"
 )
 
 // InvokeHello driver
@@ -43,7 +46,7 @@ func (setup *FabricSetup) InvokeHello(value string) (string, error) {
 		fmt.Printf("Received CC event: %s\n", ccEvent)
 	case <-time.After(time.Second * 20):
 		fmt.Errorf("did NOT receive CC event for eventId(%s)", eventID)
-		return "", "did NOT receive CC event for eventId"
+		return "", errors.New("did NOT receive CC event for eventId")
 	}
 
 	return string(response.TransactionID), nil
@@ -87,7 +90,7 @@ func (setup *FabricSetup) CreateParticipant(participant Models.Participant) (str
 		fmt.Printf("Received CC event: %s\n", ccEvent)
 	case <-time.After(time.Second * 20):
 		fmt.Errorf("did NOT receive CC event for eventId(%s)", eventID)
-		return "", "did NOT receive CC event for eventId"
+		return "", errors.New("did NOT receive CC event for eventId")
 	}
 
 	return string(response.TransactionID), nil
