@@ -498,7 +498,7 @@ func (app *Application) createParticipant(w http.ResponseWriter, r *http.Request
 	}
 
 	// Invoke the chaincode
-	txID, err2 := app.Fabric.CreateParticipant(participant)
+	txID, err2 := app.Fabric.SaveParticipant(participant)
 	if err2 != nil {
 		fmt.Printf("Unable to create participant on the chaincode: %v\n", err2)
 		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
