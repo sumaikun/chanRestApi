@@ -12,14 +12,13 @@ func (setup *FabricSetup) HistoryHello() (string, error) {
 
 	// Prepare arguments
 	var args []string
-	args = append(args, "invoke")
 	args = append(args, "history")
 	args = append(args, "hello")
 
 	fmt.Println("args to send")
 	fmt.Println(args)
 
-	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2])}})
+	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1])}})
 	if err != nil {
 		return "", fmt.Errorf("failed to query history: %v", err)
 	}
