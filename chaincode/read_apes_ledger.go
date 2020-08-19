@@ -35,14 +35,13 @@ func (t *ApesChainCode) getData(stub shim.ChaincodeStubInterface, args []string)
 func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	fmt.Println("########### ApesChainCode get Object Type results by key ###########")
 
-
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting objectType to query")
 	}
 
-	type := args[0]
+	docType := args[0]
 
-	resultsIterator, err := stub.GetStateByPartialCompositeKey("type~identification", []string{type})
+	resultsIterator, err := stub.GetStateByPartialCompositeKey("type~identification", []string{docType})
 
 	if err != nil {
 		return shim.Error(err.Error())
@@ -59,7 +58,7 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 		}
 
 		objectType, compositeKeyParts, err := stub.SplitCompositeKey(responseRange.Key)
-		
+
 		if err != nil {
 			return shim.Error(err.Error())
 		}
