@@ -64,13 +64,13 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 		}
 
 		returnedType := compositeKeyParts[0]
-		returnedId := compositeKeyParts[1]
+		returnedID := compositeKeyParts[1]
 
 		fmt.Println(objectType)
 
 		fmt.Println(returnedType)
 
-		fmt.Println(returnedId)
+		fmt.Println(returnedID)
 
 	}
 
