@@ -486,7 +486,7 @@ func (app *Application) getDataFromChaincode(w http.ResponseWriter, r *http.Requ
 
 }
 
-func (app *Application) createParticipant(w http.ResponseWriter, r *http.Request) {
+func (app *Application) saveParticipant(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	err, participant := participantValidator(r)
@@ -500,11 +500,25 @@ func (app *Application) createParticipant(w http.ResponseWriter, r *http.Request
 	// Invoke the chaincode
 	txID, err2 := app.Fabric.SaveParticipant(participant)
 	if err2 != nil {
-		fmt.Printf("Unable to create participant on the chaincode: %v\n", err2)
+		fmt.Printf("Unable to save participant on the chaincode: %v\n", err2)
 		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
 		return
 	}
-	fmt.Printf("Successfully create participant transaction ID: %s\n", txID)
+	fmt.Printf("Successfully save participant transaction ID: %s\n", txID)
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) getParticipants(w http.ResponseWriter, r *http.Request) {
+
+	response, err := app.Fabric.QueryObjectType("participant")
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": response})
 
 }

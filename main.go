@@ -142,7 +142,8 @@ func main() {
 	router.Handle("/getChaincodeData/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.getDataFromChaincode))).Methods("GET")
 
 	/* Participants */
-	router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.createParticipant))).Methods("POST")
+	router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.saveParticipant))).Methods("POST")
+	router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.createParticipant))).Methods("GET")
 
 	/* Assets */
 	//router.HandleFunc("/assets", authentication).Methods("GET")
