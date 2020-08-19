@@ -2,12 +2,13 @@ package models
 
 //Participant representation on fabric
 type Participant struct {
-	ID                   string `json:"id"`
-	DisplayName          string `json:"displayName"`
-	Email                string `json:"email"`
-	ServiceType          string `json:"serviceType"`
-	ExporterConfirmation bool   `json:"exporterConfirmation"`
-	IntegrationLevel     string `json:"integrationLevel"`
+	Name           string `json:"name"`
+	Nationality    string `json:"nationality"`
+	Address        string `json:"address"`
+	Phone          string `json:"phone"`
+	Identification string `json:"identification"`
+	PhotoURL       string `json:"photoUrl"`
+	Description    string `json:"description"`
 }
 
 //Issue or token type representation on fabric

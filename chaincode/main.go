@@ -56,9 +56,9 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	function, args := stub.GetFunctionAndParameters()
 
 	// Check whether it is an invoke request
-	if function != "invoke" {
+	/*if function == "invoke" {
 		return shim.Error("Unknown function call")
-	}
+	}*/
 
 	// Check whether the number of arguments is sufficient
 	if len(args) < 1 {
@@ -67,27 +67,27 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 	// In order to manage multiple type of request, we will check the first argument.
 	// Here we have one possible argument: query (every query request will read in the ledger without modification)
-	if args[0] == "query" {
+	if function == "query" {
 		return t.query(stub, args)
 	}
 
 	// The update argument will manage all update in the ledger
-	if args[0] == "invoke" {
+	if function == "invoke" {
 		return t.invoke(stub, args)
 	}
 
 	// Check historian
-	if args[0] == "history" {
+	if function == "history" {
 		return t.history(stub, args)
 	}
 
 	// Check key
-	if args[0] == "getData" {
+	if function == "getData" {
 		return t.getData(stub, args)
 	}
 
 	// Create participant
-	if args[0] == "createParticipant" {
+	if function == "createParticipant" {
 		return t.createParticipant(stub, args)
 	}
 
