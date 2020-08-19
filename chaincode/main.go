@@ -65,6 +65,12 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return shim.Error("The number of arguments is insufficient.")
 	}
 
+	fmt.Println("function:" + function)
+
+	fmt.Println("args")
+
+	fmt.Println(args)
+
 	// In order to manage multiple type of request, we will check the first argument.
 	// Here we have one possible argument: query (every query request will read in the ledger without modification)
 	if function == "query" {
