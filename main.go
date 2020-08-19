@@ -143,7 +143,7 @@ func main() {
 
 	/* Participants */
 	router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.saveParticipant))).Methods("POST")
-	router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.createParticipant))).Methods("GET")
+	router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.getParticipants))).Methods("GET")
 
 	/* Assets */
 	//router.HandleFunc("/assets", authentication).Methods("GET")
