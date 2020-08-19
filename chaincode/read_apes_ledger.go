@@ -32,6 +32,8 @@ func (t *ApesChainCode) getData(stub shim.ChaincodeStubInterface, args []string)
 
 }
 
+/********************************** only works with couch db ***********************************/
+
 func (t *ApesChainCode) getObjectType(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	fmt.Println("########### ApesChainCode get Object Type results ###########")
 
@@ -104,3 +106,5 @@ func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorI
 
 	return &buffer, nil
 }
+
+/********************************** only works with couch db ***********************************/
