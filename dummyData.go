@@ -1,12 +1,8 @@
 package main
 
-import (
-	Models "github.com/sumaikun/apeslogistic-rest-api/models"
-)
+//type allParticipants []Models.Participant
 
-type allParticipants []Models.Participant
-
-var participants = allParticipants{
+/*var participants = allParticipants{
 	{
 		ID:                   "DSDSADA12122",
 		DisplayName:          "Becket",
@@ -23,11 +19,11 @@ var participants = allParticipants{
 		ExporterConfirmation: true,
 		IntegrationLevel:     "Full Rfid",
 	},
-}
+}*/
 
-type allIssues []Models.Issue
+//type allIssues []Models.Issue
 
-var issues = allIssues{
+/*var issues = allIssues{
 	{
 		ID:          "32123ddsadsad2",
 		Name:        "Cinturones",
@@ -46,4 +42,4 @@ var issues = allIssues{
 		Participant: "Unibán",
 		Description: "Activo de cargamento de fruta Unibán",
 	},
-}
+}*/
