@@ -498,8 +498,8 @@ func (app *Application) createParticipant(w http.ResponseWriter, r *http.Request
 	}
 
 	// Invoke the chaincode
-	txID, err := app.Fabric.CreateParticipant(participant)
-	if err != nil {
+	txID, err2 := app.Fabric.CreateParticipant(participant)
+	if err2 != nil {
 		fmt.Printf("Unable to invoke hello on the chaincode: %v\n", err)
 		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
 		return
