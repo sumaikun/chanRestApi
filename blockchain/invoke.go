@@ -50,11 +50,11 @@ func (setup *FabricSetup) InvokeHello(value string) (string, error) {
 	return string(response.TransactionID), nil
 }
 
-// CreateParticipant driver
-func (setup *FabricSetup) CreateParticipant(participant Models.Participant) (string, error) {
+// SaveParticipant driver
+func (setup *FabricSetup) SaveParticipant(participant Models.Participant) (string, error) {
 	// Prepare arguments
 	var args []string
-	args = append(args, "createParticipant")
+	args = append(args, "saveParticipant")
 	args = append(args, participant.Name)
 	args = append(args, participant.Nationality)
 	args = append(args, participant.Address)
@@ -63,7 +63,7 @@ func (setup *FabricSetup) CreateParticipant(participant Models.Participant) (str
 	args = append(args, participant.PhotoURL)
 	args = append(args, participant.Description)
 
-	eventID := "createParticipant"
+	eventID := "saveParticipant"
 
 	// Add data that will be visible in the proposal, like a description of the invoke request
 	transientDataMap := make(map[string][]byte)

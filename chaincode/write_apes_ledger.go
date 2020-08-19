@@ -9,7 +9,7 @@ import (
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
-func (t *ApesChainCode) createParticipant(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (t *ApesChainCode) saveParticipant(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	fmt.Println("########### ApesChainCode create Participant ###########")
 	var err error
 
@@ -65,7 +65,7 @@ func (t *ApesChainCode) createParticipant(stub shim.ChaincodeStubInterface, args
 		return shim.Error("Failed to get participant: " + err.Error())
 	} else if participantAsBytes != nil {
 		fmt.Println("This participant already exists: " + identification)
-		return shim.Error("This participant already exists: " + identification)
+		//return shim.Error("This participant already exists: " + identification)
 	}
 
 	participant := &Participant{objectType, name, nationality, address, phone, identification, photoURL, description}
@@ -79,7 +79,7 @@ func (t *ApesChainCode) createParticipant(stub shim.ChaincodeStubInterface, args
 		return shim.Error(err.Error())
 	}
 
-	err = stub.SetEvent("createParticipant", []byte(identification))
+	err = stub.SetEvent("saveParticipant", []byte(identification))
 	if err != nil {
 		return shim.Error(err.Error())
 	}
