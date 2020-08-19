@@ -33,18 +33,16 @@ func (t *ApesChainCode) getData(stub shim.ChaincodeStubInterface, args []string)
 }
 
 func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	fmt.Println("########### ApesChainCode get Object Type results ###########")
+	fmt.Println("########### ApesChainCode get Object Type results by key ###########")
 
-	var objectType string
-	var err error
 
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting objectType to query")
 	}
 
-	objectType = args[0]
+	type := args[0]
 
-	resultsIterator, err := stub.GetStateByPartialCompositeKey("type~identification", []string{objectType})
+	resultsIterator, err := stub.GetStateByPartialCompositeKey("type~identification", []string{type})
 
 	if err != nil {
 		return shim.Error(err.Error())
@@ -60,15 +58,16 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 			return shim.Error(err.Error())
 		}
 
-		// get the color and name from color~name composite key
-		type, compositeKeyParts, err := stub.SplitCompositeKey(responseRange.Key)
+		objectType, compositeKeyParts, err := stub.SplitCompositeKey(responseRange.Key)
+		
 		if err != nil {
 			return shim.Error(err.Error())
 		}
+
 		returnedType := compositeKeyParts[0]
 		returnedId := compositeKeyParts[1]
 
-		fmt.Println(type)
+		fmt.Println(objectType)
 
 		fmt.Println(returnedType)
 
