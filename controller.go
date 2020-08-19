@@ -477,7 +477,7 @@ func (app *Application) getDataFromChaincode(w http.ResponseWriter, r *http.Requ
 	response, err := app.Fabric.QueryGetData(params["key"])
 	if err != nil {
 		fmt.Printf("Unable to query  the chaincode: %v\n", err)
-		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err})
 		return
 	}
 
