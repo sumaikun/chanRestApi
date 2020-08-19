@@ -44,7 +44,7 @@ func (t *ApesChainCode) getObjectType(stub shim.ChaincodeStubInterface, args []s
 
 	objectType = args[0]
 
-	queryString := fmt.Sprintf("{\"selector\":{\"docType\":\"%s\"}}", owner)
+	queryString := fmt.Sprintf("{\"selector\":{\"docType\":\"%s\"}}", objectType)
 
 	queryResults, err := getQueryResultForQueryString(stub, queryString)
 	if err != nil {
