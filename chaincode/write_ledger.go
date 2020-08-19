@@ -17,10 +17,10 @@ func (t *ApesChainCode) invoke(stub shim.ChaincodeStubInterface, args []string) 
 	}
 
 	// Check if the ledger key is "hello" and process if it is the case. Otherwise it returns an error.
-	if args[1] == "hello" && len(args) == 3 {
+	if args[0] == "hello" && len(args) == 2 {
 
 		// Write the new value in the ledger
-		err := stub.PutState("hello", []byte(args[2]))
+		err := stub.PutState("hello", []byte(args[1]))
 		if err != nil {
 			return shim.Error("Failed to update state of hello")
 		}

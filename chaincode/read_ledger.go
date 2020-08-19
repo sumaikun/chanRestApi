@@ -40,7 +40,7 @@ func (t *ApesChainCode) query(stub shim.ChaincodeStubInterface, args []string) p
 
 	// Like the Invoke function, we manage multiple type of query requests with the second argument.
 	// We also have only one possible argument: hello
-	if args[1] == "hello" {
+	if args[0] == "hello" {
 
 		// Get the state of the value matching the key hello in the ledger
 		state, err := stub.GetState("hello")
@@ -60,13 +60,13 @@ func (t *ApesChainCode) history(stub shim.ChaincodeStubInterface, args []string)
 	fmt.Println("########### ApesChainCode history ###########")
 
 	// Check whether the number of arguments is sufficient
-	if len(args) < 2 {
+	if len(args) < 1 {
 		return shim.Error("The number of arguments is insufficient.")
 	}
 
 	// Like the Invoke function, we manage multiple type of query requests with the second argument.
 	// We also have only one possible argument: hello
-	if args[1] == "hello" {
+	if args[0] == "hello" {
 
 		key := "hello"
 

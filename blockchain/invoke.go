@@ -33,7 +33,8 @@ func (setup *FabricSetup) InvokeHello(value string) (string, error) {
 	// Create a request (proposal) and send it
 	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2])}, TransientMap: transientDataMap})
 	if err != nil {
-		return "", fmt.Errorf("failed to move funds: %v", err)
+		fmt.Errorf("failed to move funds: %v", err)
+		return "", err
 	}
 
 	// Wait for the result of the submission
@@ -41,7 +42,8 @@ func (setup *FabricSetup) InvokeHello(value string) (string, error) {
 	case ccEvent := <-notifier:
 		fmt.Printf("Received CC event: %s\n", ccEvent)
 	case <-time.After(time.Second * 20):
-		return "", fmt.Errorf("did NOT receive CC event for eventId(%s)", eventID)
+		fmt.Errorf("did NOT receive CC event for eventId(%s)", eventID)
+		return "", "did NOT receive CC event for eventId"
 	}
 
 	return string(response.TransactionID), nil
@@ -75,7 +77,8 @@ func (setup *FabricSetup) CreateParticipant(participant Models.Participant) (str
 	// Create a request (proposal) and send it
 	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3]), []byte(args[4]), []byte(args[5]), []byte(args[6]), []byte(args[7])}, TransientMap: transientDataMap})
 	if err != nil {
-		return "", fmt.Errorf("failed to move funds: %v", err)
+		fmt.Errorf("failed to move funds: %v", err)
+		return "", err
 	}
 
 	// Wait for the result of the submission
@@ -83,7 +86,8 @@ func (setup *FabricSetup) CreateParticipant(participant Models.Participant) (str
 	case ccEvent := <-notifier:
 		fmt.Printf("Received CC event: %s\n", ccEvent)
 	case <-time.After(time.Second * 20):
-		return "", fmt.Errorf("did NOT receive CC event for eventId(%s)", eventID)
+		fmt.Errorf("did NOT receive CC event for eventId(%s)", eventID)
+		return "", "did NOT receive CC event for eventId"
 	}
 
 	return string(response.TransactionID), nil
