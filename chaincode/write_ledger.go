@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
 // invoke
