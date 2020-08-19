@@ -8,8 +8,6 @@ import (
 	"github.com/pkg/errors"
 
 	Models "github.com/sumaikun/apeslogistic-rest-api/models"
-
-	"errors"
 )
 
 // InvokeHello driver
