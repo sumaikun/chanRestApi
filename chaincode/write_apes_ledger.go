@@ -79,6 +79,11 @@ func (t *ApesChainCode) createParticipant(stub shim.ChaincodeStubInterface, args
 		return shim.Error(err.Error())
 	}
 
+	err = stub.SetEvent("createParticipant", []byte{"identification"})
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
 	return shim.Success(nil)
 
 }
