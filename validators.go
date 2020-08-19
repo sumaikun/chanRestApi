@@ -40,3 +40,32 @@ func userValidator(r *http.Request) (map[string]interface{}, Models.User) {
 
 	return err, user
 }
+
+func participantValidator(r *http.Request) (map[string]interface{}, Models.Participant) {
+
+	var participant Models.Participant
+
+	rules := govalidator.MapData{
+		"name":           []string{"required"},
+		"nationality":    []string{"required"},
+		"address":        []string{"required"},
+		"phone":          []string{"required"},
+		"identification": []string{"required"},
+		"description":    []string{"required"},
+	}
+
+	opts := govalidator.Options{
+		Request:         r,
+		Data:            &participant,
+		Rules:           rules,
+		RequiredDefault: true,
+	}
+
+	v := govalidator.New(opts)
+	e := v.ValidateJSON()
+	//fmt.Println(user)
+
+	err := map[string]interface{}{"validationError": e}
+
+	return err, participant
+}

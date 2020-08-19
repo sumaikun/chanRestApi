@@ -463,3 +463,50 @@ func (app *Application) historyHelloChainCode(w http.ResponseWriter, r *http.Req
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": response})
 
 }
+
+func (app *Application) getDataFromChaincode(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+	}
+
+	defer r.Body.Close()
+
+	response, err := app.Fabric.QueryGetData(params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": response})
+
+}
+
+func (app *Application) createParticipant(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, participant := participantValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Invoke the chaincode
+	response, err := app.Fabric.CreateParticipant(participant)
+	if err != nil {
+		fmt.Printf("Unable to create participant on the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
+		return
+	}
+
+	//fmt.Printf("Response from the history hello: %s\n", response)
+
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": response})
+
+}

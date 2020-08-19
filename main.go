@@ -138,8 +138,11 @@ func main() {
 	router.HandleFunc("/invokeHelloChainCode/{word}", app.invokeHelloChaincode).Methods("GET")
 	router.HandleFunc("/historyHelloChainCode", app.historyHelloChainCode).Methods("GET")
 
+	/*get data from chaincode */
+	router.Handle("/getChaincodeData/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.getDataFromChaincode))).Methods("GET")
+
 	/* Participants */
-	//router.HandleFunc("/participants", authentication).Methods("GET")
+	router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.createParticipant))).Methods("POST")
 
 	/* Assets */
 	//router.HandleFunc("/assets", authentication).Methods("GET")
