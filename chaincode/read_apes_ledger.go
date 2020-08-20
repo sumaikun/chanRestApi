@@ -51,7 +51,8 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 
 	var i int
 
-	jsonResp := "["
+	var buffer bytes.Buffer
+	buffer.WriteString("[")
 
 	for i = 0; resultsIterator.HasNext(); i++ {
 
@@ -59,6 +60,8 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 		if err != nil {
 			return shim.Error(err.Error())
 		}
+
+		fmt.Println(responseRange)
 
 		objectType, compositeKeyParts, err := stub.SplitCompositeKey(responseRange.Key)
 
@@ -75,13 +78,13 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 
 		fmt.Println(returnedID)
 
-		valAsbytes, err := stub.GetState(key)
+		valAsbytes, err := stub.GetState(returnedID)
 
-		jsonResp += valAsbytes
+		buffer.WriteString(string(valAsbytes))
 
 	}
 
-	jsonResp += "]"
+	buffer.WriteString("]")
 
 	return shim.Success(jsonResp)
 
