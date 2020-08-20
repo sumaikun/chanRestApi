@@ -50,6 +50,9 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 	defer resultsIterator.Close()
 
 	var i int
+
+	var jsonResp := "["
+
 	for i = 0; resultsIterator.HasNext(); i++ {
 
 		responseRange, err := resultsIterator.Next()
@@ -72,9 +75,15 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 
 		fmt.Println(returnedID)
 
+		valAsbytes, err := stub.GetState(key)
+
+		jsonResp += valAsbytes 
+
 	}
 
-	return shim.Success(nil)
+	jsonResp += "]"
+
+	return shim.Success(jsonResp)
 
 }
 
