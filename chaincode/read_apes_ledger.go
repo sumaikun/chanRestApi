@@ -61,7 +61,7 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 			return shim.Error(err.Error())
 		}
 
-		fmt.Println(responseRange)
+		//fmt.Println(responseRange)
 
 		objectType, compositeKeyParts, err := stub.SplitCompositeKey(responseRange.Key)
 
@@ -86,7 +86,7 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 
 	buffer.WriteString("]")
 
-	return shim.Success(jsonResp)
+	return shim.Success(buffer.Bytes())
 
 }
 
