@@ -45,7 +45,7 @@ func (setup *FabricSetup) QueryObjectType(key string) (string, error) {
 
 	// Prepare arguments
 	var args []string
-	args = append(args, "getObjectType")
+	args = append(args, "getObjectTypeWithKey")
 	args = append(args, key)
 
 	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1])}})

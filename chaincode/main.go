@@ -102,6 +102,10 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.getObjectType(stub, args)
 	}
 
+	if function == "getObjectTypeWithKey" {
+		return t.getObjectTypeWithKey(stub, args)
+	}
+
 	// If the arguments given don’t match any function, we return an error
 	return shim.Error("Unknown action, check the first argument: " + args[0])
 }
