@@ -74,6 +74,8 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 
 	}
 
+	return shim.Success(nil)
+
 }
 
 /********************************** only works with couch db ***********************************/
