@@ -37,7 +37,7 @@ func (setup *FabricSetup) QueryGetData(key string) (string, error) {
 		return "", err
 	}
 
-	return string(response.Payload), nil
+	return response.Payload, nil
 }
 
 // QueryObjectType query the chaincode to get the state of a key
