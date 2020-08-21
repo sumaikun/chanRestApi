@@ -23,6 +23,19 @@ type Participant struct {
 	Description    string `json:"description"`
 }
 
+// Asset representation in chaincode
+type Asset struct {
+	ObjectType     string `json:"docType"`
+	Participant    string `json:"participant"`
+	State          string `json:"state"`
+	Location       string `json:"location"`
+	Meta           string `json:"meta"`
+	Identification string `json:"identification"`
+	Title          string `json:"title"`
+	Date           string `json:"date"`
+	AssetType      string `json:"assetType"`
+}
+
 // Init of the chaincode
 // This function is called only one when the chaincode is instantiated.
 // So the goal is to prepare the ledger to handle future requests.
@@ -92,9 +105,14 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.getData(stub, args)
 	}
 
-	// Create participant
+	// Create or updata participant
 	if function == "saveParticipant" {
 		return t.saveParticipant(stub, args)
+	}
+
+	// Create or update asset
+	if function == "saveAsset" {
+		return t.saveAsset(stub, args)
 	}
 
 	// Get data result from objectType

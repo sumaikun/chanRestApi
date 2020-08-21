@@ -11,17 +11,15 @@ type Participant struct {
 	Description    string `json:"description"`
 }
 
-//Issue or token type representation on fabric
-type Issue struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Participant string `json:"participant"`
-	Description string `json:"description"`
-}
-
-//Assets representation on fabric
-type Assets struct {
-	ID    string `json:"id"`
-	Issue string `json:"issue"`
-	Meta  string `json:"meta"`
+// Asset representation in chaincode
+type Asset struct {
+	ObjectType     string `json:"docType"`
+	Participant    string `json:"participant"`
+	State          string `json:"state"`
+	Location       string `json:"location"`
+	Meta           string `json:"meta"`
+	Identification string `json:"identification"`
+	Title          string `json:"title"`
+	Date           string `json:"date"`
+	AssetType      string `json:"assetType"`
 }

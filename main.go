@@ -146,7 +146,8 @@ func main() {
 	router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.getParticipants))).Methods("GET")
 
 	/* Assets */
-	//router.HandleFunc("/assets", authentication).Methods("GET")
+	router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.saveAsset))).Methods("POST")
+	router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.getAssets))).Methods("GET")
 
 	/* ISSUES */
 	//router.HandleFunc("/issues", authentication).Methods("GET")

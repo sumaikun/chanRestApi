@@ -69,3 +69,32 @@ func participantValidator(r *http.Request) (map[string]interface{}, Models.Parti
 
 	return err, participant
 }
+
+func assetValidator(r *http.Request) (map[string]interface{}, Models.Asset) {
+
+	var asset Models.Asset
+
+	rules := govalidator.MapData{
+		"participant":    []string{"required"},
+		"state":          []string{"required"},
+		"location":       []string{"required"},
+		"title":          []string{"required"},
+		"identification": []string{"required"},
+		"assetType":      []string{"required"},
+	}
+
+	opts := govalidator.Options{
+		Request:         r,
+		Data:            &asset,
+		Rules:           rules,
+		RequiredDefault: true,
+	}
+
+	v := govalidator.New(opts)
+	e := v.ValidateJSON()
+	//fmt.Println(user)
+
+	err := map[string]interface{}{"validationError": e}
+
+	return err, asset
+}
