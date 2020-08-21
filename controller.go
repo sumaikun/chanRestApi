@@ -534,6 +534,8 @@ func (app *Application) saveAsset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	asset.Date = time.Now().String()
+
 	// Invoke the chaincode
 	txID, err2 := app.Fabric.SaveAsset(asset)
 	if err2 != nil {
