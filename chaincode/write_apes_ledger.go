@@ -168,7 +168,7 @@ func (t *ApesChainCode) saveAsset(stub shim.ChaincodeStubInterface, args []strin
 		return shim.Error(err.Error())
 	}
 
-	err = stub.PutState(identification, participantJSONasBytes)
+	err = stub.PutState(identification, assetJSONasBytes)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
