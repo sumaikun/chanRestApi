@@ -41,7 +41,7 @@ func (setup *FabricSetup) QueryGetData(key string) ([]byte, error) {
 }
 
 // QueryObjectType query the chaincode to get the state of a key
-func (setup *FabricSetup) QueryObjectType(key string) (string, error) {
+func (setup *FabricSetup) QueryObjectType(key string) ([]byte, error) {
 
 	// Prepare arguments
 	var args []string
@@ -51,8 +51,8 @@ func (setup *FabricSetup) QueryObjectType(key string) (string, error) {
 	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1])}})
 	if err != nil {
 		fmt.Errorf("failed to query: %v", err)
-		return "", err
+		return nil, err
 	}
 
-	return string(response.Payload), nil
+	return response.Payload, nil
 }
