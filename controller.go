@@ -482,7 +482,13 @@ func (app *Application) getDataFromChaincode(w http.ResponseWriter, r *http.Requ
 	}
 
 	fmt.Printf("Response from chaincode: %s\n", response)
-	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": response})
+
+	out, err := json.Marshal(response)
+	if err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": out})
 
 }
 
