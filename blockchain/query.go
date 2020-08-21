@@ -24,7 +24,7 @@ func (setup *FabricSetup) QueryHello() (string, error) {
 }
 
 // QueryGetData query the chaincode to get the state of a key
-func (setup *FabricSetup) QueryGetData(key string) (string, error) {
+func (setup *FabricSetup) QueryGetData(key string) ([]byte, error) {
 
 	// Prepare arguments
 	var args []string
