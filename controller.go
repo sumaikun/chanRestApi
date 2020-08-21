@@ -531,9 +531,10 @@ func (app *Application) getParticipants(w http.ResponseWriter, r *http.Request) 
 
 	fmt.Printf("Response from chaincode: %s\n", response)
 
-	var raw map[string]interface{}
+	var raw []interface{}
 	if err := json.Unmarshal(response, &raw); err != nil {
 		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
 	}
 
 	Helpers.RespondWithJSON(w, http.StatusOK, raw)
@@ -576,9 +577,10 @@ func (app *Application) getAssets(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("Response from chaincode: %s\n", response)
 
-	var raw map[string]interface{}
+	var raw []interface{}
 	if err := json.Unmarshal(response, &raw); err != nil {
 		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
 	}
 
 	Helpers.RespondWithJSON(w, http.StatusOK, raw)
