@@ -488,7 +488,7 @@ func (app *Application) getDataFromChaincode(w http.ResponseWriter, r *http.Requ
 		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": out})
+	Helpers.RespondWithJSON(w, http.StatusOK, out)
 
 }
 
