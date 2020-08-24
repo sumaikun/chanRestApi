@@ -54,11 +54,17 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 	var buffer bytes.Buffer
 	buffer.WriteString("[")
 
+	bArrayMemberAlreadyWritten := false
+
 	for i = 0; resultsIterator.HasNext(); i++ {
 
 		responseRange, err := resultsIterator.Next()
 		if err != nil {
 			return shim.Error(err.Error())
+		}
+
+		if bArrayMemberAlreadyWritten == true {
+			buffer.WriteString(",")
 		}
 
 		//fmt.Println(responseRange)
@@ -81,6 +87,8 @@ func (t *ApesChainCode) getObjectTypeWithKey(stub shim.ChaincodeStubInterface, a
 		valAsbytes, err := stub.GetState(returnedID)
 
 		buffer.WriteString(string(valAsbytes))
+
+		bArrayMemberAlreadyWritten = true
 
 	}
 
