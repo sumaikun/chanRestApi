@@ -100,11 +100,11 @@ func main() {
 	defer fSetup.CloseSDK()
 
 	// Install and instantiate the chaincode
-	err = fSetup.InstallAndInstantiateCC()
+	/*err = fSetup.InstallAndInstantiateCC()
 	if err != nil {
 		fmt.Printf("Unable to install and instantiate the chaincode: %v\n", err)
 		return
-	}
+	}*/
 
 	app := Application{
 		Fabric: &fSetup,
@@ -148,6 +148,10 @@ func main() {
 	/* Assets */
 	router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.saveAsset))).Methods("POST")
 	router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.getAssets))).Methods("GET")
+
+	/* Infrastructure */
+	router.Handle("/installChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.installChainCode))).Methods("POST")
+	router.Handle("/instantiateChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.instantiateChainCode))).Methods("GET")
 
 	/* ISSUES */
 	//router.HandleFunc("/issues", authentication).Methods("GET")

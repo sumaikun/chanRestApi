@@ -136,6 +136,35 @@ func (setup *FabricSetup) InstallAndInstantiateCC() error {
 	return nil
 }
 
+func (setup *FabricSetup) InstantiateCC() error {
+	// Set up chaincode policy
+	ccPolicy := cauthdsl.SignedByAnyMember([]string{"org1.hf.chainhero.io"})
+
+	resp, err := setup.admin.InstantiateCC(setup.ChannelID, resmgmt.InstantiateCCRequest{Name: setup.ChainCodeID, Path: setup.ChaincodeGoPath, Version: "0", Args: [][]byte{[]byte("init")}, Policy: ccPolicy})
+	if err != nil || resp.TransactionID == "" {
+		return errors.WithMessage(err, "failed to instantiate the chaincode")
+	}
+	fmt.Println("Chaincode instantiated")
+
+	// Channel client is used to query and execute transactions
+	clientContext := setup.sdk.ChannelContext(setup.ChannelID, fabsdk.WithUser(setup.UserName))
+	setup.client, err = channel.New(clientContext)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create new channel client")
+	}
+	fmt.Println("Channel client created")
+
+	// Creation of the client which will enables access to our channel events
+	setup.event, err = event.New(clientContext)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create new event client")
+	}
+	fmt.Println("Event client created")
+
+	fmt.Println("Chaincode  Instantiation Successful")
+	return nil
+}
+
 func (setup *FabricSetup) CloseSDK() {
 	setup.sdk.Close()
 }
