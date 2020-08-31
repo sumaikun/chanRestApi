@@ -26,7 +26,7 @@ var (
 
 var dao = Dao.MongoConnector{}
 
-var fSetup = blockchain.FabricSetup{
+/*var fSetup = blockchain.FabricSetup{
 	// Network parameters
 	OrdererID: "orderer.hf.chainhero.io",
 
@@ -40,6 +40,26 @@ var fSetup = blockchain.FabricSetup{
 	ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/chaincode/",
 	OrgAdmin:        "Admin",
 	OrgName:         "org1",
+	ConfigFile:      "config.yaml",
+
+	// User parameters
+	UserName: "User1",
+}*/
+
+var fSetup = blockchain.FabricSetup{
+	// Network parameters
+	OrdererID: "orderer.technoapes.co",
+
+	// Channel parameters
+	ChannelID:     "apeschannel",
+	ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/sumaikun/apeslogistic-rest-api/fixtures/artifacts/apes-channel.tx",
+
+	// Chaincode parameters
+	ChainCodeID:     "apeschain",
+	ChaincodeGoPath: os.Getenv("GOPATH"),
+	ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/chaincode/",
+	OrgAdmin:        "Admin",
+	OrgName:         "apes",
 	ConfigFile:      "config.yaml",
 
 	// User parameters

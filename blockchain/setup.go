@@ -5,14 +5,12 @@ import (
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/event"
-	mspclient "github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/resmgmt"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
-	packager "github.com/hyperledger/fabric-sdk-go/pkg/fab/ccpackager/gopackager"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
-	"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/common/cauthdsl"
+
+	//"github.com/hyperledger/fabric-sdk-go/third_party/github.com/hyperledger/fabric/common/cauthdsl"
+
 	"github.com/pkg/errors"
 )
 
@@ -39,6 +37,13 @@ type FabricSetup struct {
 // Initialize reads the configuration file and sets up the client, chain and event hub
 func (setup *FabricSetup) Initialize() error {
 
+	const (
+		channelID      = "apeschannel"
+		orgAdmin       = "Admin"
+		ordererOrgName = "OrdererMSP"
+		orgName        = "apes"
+	)
+
 	// Add parameters for the initialization
 	if setup.initialized {
 		return errors.New("sdk already initialized")
@@ -52,8 +57,52 @@ func (setup *FabricSetup) Initialize() error {
 	setup.sdk = sdk
 	fmt.Println("SDK created")
 
+	/*clientChannelContext := sdk.ChannelContext(channelID, fabsdk.WithUser(orgAdmin), fabsdk.WithOrg(orgName))
+	// Channel client is used to query and execute transactions (Org1 is default org)
+	client, err := channel.New(clientChannelContext)
+	if err != nil {
+		return errors.WithMessage(err, "Failed to create new channel client: %s")
+	}
+
+	setup.client = client*/
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	clientContext := setup.sdk.ChannelContext(setup.ChannelID, fabsdk.WithUser(setup.UserName))
+	setup.client, err = channel.New(clientContext)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create new channel client")
+	}
+	fmt.Println("Channel client created")
+
+	// Creation of the client which will enables access to our channel events
+	setup.event, err = event.New(clientContext)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create new event client")
+	}
+	fmt.Println("Event client created")
+
+	var args []string
+	args = append(args, "query")
+	args = append(args, "hello")
+
+	response, err := setup.client.Execute(
+		channel.Request{
+			ChaincodeID: setup.ChainCodeID,
+			Fcn:         args[0],
+			Args:        [][]byte{[]byte(args[1])},
+		},
+	)
+
+	if err != nil {
+		return errors.WithMessage(err, "failed execute chaincode")
+	}
+
+	fmt.Println(response)
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	// The resource management client is responsible for managing channels (create/update channel)
-	resourceManagerClientContext := setup.sdk.Context(fabsdk.WithUser(setup.OrgAdmin), fabsdk.WithOrg(setup.OrgName))
+	/*resourceManagerClientContext := setup.sdk.Context(fabsdk.WithUser(setup.OrgAdmin), fabsdk.WithOrg(setup.OrgName))
 	if err != nil {
 		return errors.WithMessage(err, "failed to load Admin identity")
 	}
@@ -62,36 +111,46 @@ func (setup *FabricSetup) Initialize() error {
 		return errors.WithMessage(err, "failed to create channel management client from Admin identity")
 	}
 	setup.admin = resMgmtClient
-	fmt.Println("Ressource management client created")
+	fmt.Println("Ressource management client created")*/
 
 	// The MSP client allow us to retrieve user information from their identity, like its signing identity which we will need to save the channel
-	mspClient, err := mspclient.New(sdk.Context(), mspclient.WithOrg(setup.OrgName))
+	/*mspClient, err := mspclient.New(sdk.Context(), mspclient.WithOrg(setup.OrgName))
 	if err != nil {
 		return errors.WithMessage(err, "failed to create MSP client")
 	}
+
 	adminIdentity, err := mspClient.GetSigningIdentity(setup.OrgAdmin)
 	if err != nil {
 		return errors.WithMessage(err, "failed to get admin signing identity")
-	}
-	req := resmgmt.SaveChannelRequest{ChannelID: setup.ChannelID, ChannelConfigPath: setup.ChannelConfig, SigningIdentities: []msp.SigningIdentity{adminIdentity}}
+	}*/
+
+	/*req := resmgmt.SaveChannelRequest{ChannelID: setup.ChannelID, ChannelConfigPath: setup.ChannelConfig, SigningIdentities: []msp.SigningIdentity{adminIdentity}}
 	txID, err := setup.admin.SaveChannel(req, resmgmt.WithOrdererEndpoint(setup.OrdererID))
 	if err != nil || txID.TransactionID == "" {
 		return errors.WithMessage(err, "failed to save channel")
 	}
-	fmt.Println("Channel created")
+	fmt.Println("Channel created")*/
 
 	// Make admin user join the previously created channel
-	if err = setup.admin.JoinChannel(setup.ChannelID, resmgmt.WithRetry(retry.DefaultResMgmtOpts), resmgmt.WithOrdererEndpoint(setup.OrdererID)); err != nil {
+	/*if err = setup.admin.JoinChannel(setup.ChannelID, resmgmt.WithRetry(retry.DefaultResMgmtOpts), resmgmt.WithOrdererEndpoint(setup.OrdererID)); err != nil {
 		return errors.WithMessage(err, "failed to make admin join channel")
 	}
 	fmt.Println("Channel joined")
 
 	fmt.Println("Initialization Successful")
-	setup.initialized = true
+	setup.initialized = true*/
+
+	/*clientContext := setup.sdk.ChannelContext(setup.ChannelID, fabsdk.WithUser(setup.UserName))
+	setup.client, err = channel.New(clientContext)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create new channel client")
+	}
+	fmt.Println("Channel client created")*/
+
 	return nil
 }
 
-func (setup *FabricSetup) InstallAndInstantiateCC() error {
+/*func (setup *FabricSetup) InstallAndInstantiateCC() error {
 
 	// Create the chaincode package that will be sent to the peers
 	ccPkg, err := packager.NewCCPackage(setup.ChaincodePath, setup.ChaincodeGoPath)
@@ -162,6 +221,14 @@ func (setup *FabricSetup) InstantiateCC() error {
 	fmt.Println("Event client created")
 
 	fmt.Println("Chaincode  Instantiation Successful")
+	return nil
+}*/
+
+func (setup *FabricSetup) InstallAndInstantiateCC() error {
+	return nil
+}
+
+func (setup *FabricSetup) InstantiateCC() error {
 	return nil
 }
 
