@@ -412,16 +412,24 @@ func getFileContentType(out *os.File) (string, error) {
 
 func (app *Application) queryHelloChainCode(w http.ResponseWriter, r *http.Request) {
 
-	// Query the chaincode
-	response, err := app.Fabric.QueryHello()
+	network, err := app.gway.GetNetwork("airlinechannel")
 	if err != nil {
-		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
-		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
-		return
+		fmt.Printf("Failed to get network: %s\n", err)
+		os.Exit(1)
 	}
 
-	fmt.Printf("Response from the query hello: %s\n", response)
-	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": response})
+	fmt.Println(network)
+
+	contract := network.GetContract("gocc1")
+
+	result, err := contract.EvaluateTransaction("query", "hello")
+	if err != nil {
+		fmt.Printf("Failed to evaluate transaction: %s\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Response from the query hello: %s\n", result)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": string(result)})
 
 }
 
@@ -435,35 +443,51 @@ func (app *Application) invokeHelloChaincode(w http.ResponseWriter, r *http.Requ
 
 	defer r.Body.Close()
 
-	// Invoke the chaincode
-	txID, err := app.Fabric.InvokeHello(params["word"])
+	network, err := app.gway.GetNetwork("airlinechannel")
 	if err != nil {
-		fmt.Printf("Unable to invoke hello on the chaincode: %v\n", err)
-		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
-		return
+		fmt.Printf("Failed to get network: %s\n", err)
+		os.Exit(1)
 	}
-	fmt.Printf("Successfully invoke hello, transaction ID: %s\n", txID)
-	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+	fmt.Println(network)
+
+	contract := network.GetContract("gocc1")
+
+	result, err := contract.SubmitTransaction("invoke", "hello", params["word"])
+	if err != nil {
+		fmt.Printf("Failed to submit transaction: %s\n", err)
+		os.Exit(1)
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": string(result)})
 
 }
 
 func (app *Application) historyHelloChainCode(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
-	// Invoke the chaincode
-	response, err := app.Fabric.HistoryHello()
+	network, err := app.gway.GetNetwork("airlinechannel")
 	if err != nil {
-		fmt.Printf("Unable to history hello on the chaincode: %v\n", err)
-		Helpers.RespondWithJSON(w, http.StatusBadGateway, err)
-		return
+		fmt.Printf("Failed to get network: %s\n", err)
+		os.Exit(1)
 	}
 
-	fmt.Printf("Response from the history hello: %s\n", response)
+	fmt.Println(network)
 
-	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": response})
+	contract := network.GetContract("gocc1")
+
+	result, err := contract.EvaluateTransaction("history", "hello")
+	if err != nil {
+		fmt.Printf("Failed to evaluate transaction: %s\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Response from the history hello: %s\n", result)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": string(result)})
 
 }
 
+/*
 func (app *Application) getDataFromChaincode(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
@@ -483,10 +507,6 @@ func (app *Application) getDataFromChaincode(w http.ResponseWriter, r *http.Requ
 
 	fmt.Printf("Response from chaincode: %s\n", response)
 
-	/*out, err := json.Marshal(response)
-	if err != nil {
-		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}*/
 
 	var raw map[string]interface{}
 	if err := json.Unmarshal(response, &raw); err != nil {
@@ -589,6 +609,7 @@ func (app *Application) getAssets(w http.ResponseWriter, r *http.Request) {
 
 //------------------------ Fabric infraestricture services
 
+/*
 func (app *Application) installChainCode(w http.ResponseWriter, r *http.Request) {
 	err := app.Fabric.InstallAndInstantiateCC()
 	if err != nil {
@@ -609,4 +630,4 @@ func (app *Application) instantiateChainCode(w http.ResponseWriter, r *http.Requ
 
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "chaincode instantiated"})
 	return
-}
+}*/

@@ -37,12 +37,12 @@ type FabricSetup struct {
 // Initialize reads the configuration file and sets up the client, chain and event hub
 func (setup *FabricSetup) Initialize() error {
 
-	const (
+	/*const (
 		channelID      = "apeschannel"
 		orgAdmin       = "Admin"
 		ordererOrgName = "OrdererMSP"
 		orgName        = "apes"
-	)
+	)*/
 
 	// Add parameters for the initialization
 	if setup.initialized {
@@ -67,7 +67,7 @@ func (setup *FabricSetup) Initialize() error {
 	setup.client = client*/
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	clientContext := setup.sdk.ChannelContext(setup.ChannelID, fabsdk.WithUser(setup.UserName))
+	/*clientContext := setup.sdk.ChannelContext(setup.ChannelID, fabsdk.WithUser(setup.UserName))
 	setup.client, err = channel.New(clientContext)
 	if err != nil {
 		return errors.WithMessage(err, "failed to create new channel client")
@@ -97,7 +97,7 @@ func (setup *FabricSetup) Initialize() error {
 		return errors.WithMessage(err, "failed execute chaincode")
 	}
 
-	fmt.Println(response)
+	fmt.Println(response)*/
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

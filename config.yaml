@@ -152,14 +152,14 @@ organizations:
 # SDK is implementation specific. Consult each SDK's documentation for its handling of orderers.
 #
 orderers:
-  technoapes.co:
+  orderer.technoapes.co:
     # [Optional] Default: Infer from hostname
     url: 34.200.21.254:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
     grpcOptions:
-      ssl-target-name-override: technoapes.co
+      ssl-target-name-override: orderer.technoapes.co
       # These parameters should be set in coordination with the keepalive policy on the server,
       # as incompatible settings can result in closing of connection.
       # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
@@ -180,7 +180,7 @@ orderers:
 #
 peers:
   
-  grupobimbo.com:
+  devpeer.grupobimbo.com:
     url: 54.224.143.239:7051
     eventUrl: 54.224.143.239:7053
     grpcOptions:
@@ -198,9 +198,9 @@ peers:
     tlsCACerts:
       path: ./fixtures/crypto-config/peerOrganizations/grupobimbo.com/tlsca/tlsca.grupobimbo.com-cert.pem
   
-  technoapes.co:
+  devpeer.technoapes.co:
     url: 34.200.21.254:8051
-    eventUrl: 54.224.143.239:7053
+    eventUrl: 34.200.21.254:7053
     grpcOptions:
       ssl-target-name-override: technoapes.co
       # These parameters should be set in coordination with the keepalive policy on the server,
@@ -327,23 +327,23 @@ certificateAuthorities:
 
 entityMatchers:
   peer:
-    - pattern: (\w*)grupobimbo.com(\w*)
+    - pattern: (\w*)devpeer.grupobimbo.com(\w*)
       urlSubstitutionExp: grpc://54.224.143.239:7051
       eventUrlSubstitutionExp: grpc://54.224.143.239:7053
-      sslTargetOverrideUrlSubstitutionExp: grupobimbo.com
-      mappedHost: grupobimbo.com
+      sslTargetOverrideUrlSubstitutionExp: devpeer.grupobimbo.com
+      mappedHost: devpeer.grupobimbo.com
 
-    - pattern: (\w*)technoapes.co(\w*)
+    - pattern: (\w*)devpeer.technoapes.co(\w*)
       urlSubstitutionExp: grpc://34.200.21.254:7051
       eventUrlSubstitutionExp: grpc://34.200.21.254:7053
-      sslTargetOverrideUrlSubstitutionExp: technoapes.co
-      mappedHost: technoapes.co
+      sslTargetOverrideUrlSubstitutionExp: devpeer.technoapes.co
+      mappedHost: devpeer.technoapes.co
 
   orderer:
-    - pattern: (\w*)technoapes.co(\w*)
+    - pattern: (\w*)orderer.technoapes.co(\w*)
       urlSubstitutionExp: grpc://34.200.21.254:7050
-      sslTargetOverrideUrlSubstitutionExp: technoapes.co
-      mappedHost: technoapes.co
+      sslTargetOverrideUrlSubstitutionExp: orderer.technoapes.co
+      mappedHost: orderer.technoapes.co
 
   certificateAuthorities:
     - pattern: (\w*)ca.grupobimbo.com(\w*)

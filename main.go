@@ -1,14 +1,17 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
-	//"github.com/chainHero/heroes-service/blockchain"
 	"github.com/gorilla/mux"
-	"github.com/sumaikun/apeslogistic-rest-api/blockchain"
+	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
+	"github.com/hyperledger/fabric-sdk-go/pkg/gateway"
 	Config "github.com/sumaikun/apeslogistic-rest-api/config"
 	Dao "github.com/sumaikun/apeslogistic-rest-api/dao"
 	middleware "github.com/sumaikun/apeslogistic-rest-api/middlewares"
@@ -16,7 +19,7 @@ import (
 
 //Application object to chaincode connection
 type Application struct {
-	Fabric *blockchain.FabricSetup
+	gway *gateway.Gateway
 }
 
 var (
@@ -25,46 +28,6 @@ var (
 )
 
 var dao = Dao.MongoConnector{}
-
-/*var fSetup = blockchain.FabricSetup{
-	// Network parameters
-	OrdererID: "orderer.hf.chainhero.io",
-
-	// Channel parameters
-	ChannelID:     "chainhero",
-	ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/chainHero/heroes-service/fixtures/artifacts/chainhero.channel.tx",
-
-	// Chaincode parameters
-	ChainCodeID:     "heroes-service",
-	ChaincodeGoPath: os.Getenv("GOPATH"),
-	ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/chaincode/",
-	OrgAdmin:        "Admin",
-	OrgName:         "org1",
-	ConfigFile:      "config.yaml",
-
-	// User parameters
-	UserName: "User1",
-}*/
-
-var fSetup = blockchain.FabricSetup{
-	// Network parameters
-	OrdererID: "orderer.technoapes.co",
-
-	// Channel parameters
-	ChannelID:     "apeschannel",
-	ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/sumaikun/apeslogistic-rest-api/fixtures/artifacts/apes-channel.tx",
-
-	// Chaincode parameters
-	ChainCodeID:     "apeschain",
-	ChaincodeGoPath: os.Getenv("GOPATH"),
-	ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/chaincode/",
-	OrgAdmin:        "Admin",
-	OrgName:         "apes",
-	ConfigFile:      "config.yaml",
-
-	// User parameters
-	UserName: "User1",
-}
 
 func init() {
 
@@ -111,26 +74,64 @@ func (c *CORSRouterDecorator) ServeHTTP(rw http.ResponseWriter, req *http.Reques
 
 func main() {
 
-	err := fSetup.Initialize()
+	os.Setenv("DISCOVERY_AS_LOCALHOST", "true")
+	wallet, err := gateway.NewFileSystemWallet("wallet")
 	if err != nil {
-		fmt.Printf("Unable to initialize the Fabric SDK: %v\n", err)
-		return
+		fmt.Printf("Failed to create wallet: %s\n", err)
+		os.Exit(1)
 	}
-	// Close SDK
-	defer fSetup.CloseSDK()
 
-	// Install and instantiate the chaincode
-	/*err = fSetup.InstallAndInstantiateCC()
+	if !wallet.Exists("appUser") {
+		err = populateWallet(wallet)
+		if err != nil {
+			fmt.Printf("Failed to populate wallet contents: %s\n", err)
+			os.Exit(1)
+		}
+	}
+
+	ccpPath := filepath.Join(
+		"/",
+		"home",
+		"ubuntu",
+		"go",
+		"src",
+		"github.com",
+		"sumaikun",
+		"apeslogistic-rest-api",
+		"fixtures",
+		"connection-Budget.yaml",
+	)
+
+	gw, err := gateway.Connect(
+		gateway.WithConfig(config.FromFile(filepath.Clean(ccpPath))),
+		gateway.WithIdentity(wallet, "appUser"),
+	)
 	if err != nil {
-		fmt.Printf("Unable to install and instantiate the chaincode: %v\n", err)
-		return
-	}*/
+		fmt.Printf("Failed to connect to gateway: %s\n", err)
+		os.Exit(1)
+	}
+	defer gw.Close()
+
+	network, err := gw.GetNetwork("airlinechannel")
+	if err != nil {
+		fmt.Printf("Failed to get network: %s\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println(network)
+
+	contract := network.GetContract("gocc1")
+
+	result, err := contract.EvaluateTransaction("query", "hello")
+	if err != nil {
+		fmt.Printf("Failed to evaluate transaction: %s\n", err)
+		os.Exit(1)
+	}
+	fmt.Println(string(result))
 
 	app := Application{
-		Fabric: &fSetup,
+		gway: gw,
 	}
-
-	fmt.Println("finish chaincode declaration")
 
 	fmt.Println("start server in port " + port)
 	router := mux.NewRouter().StrictSlash(true)
@@ -159,19 +160,19 @@ func main() {
 	router.HandleFunc("/historyHelloChainCode", app.historyHelloChainCode).Methods("GET")
 
 	/*get data from chaincode */
-	router.Handle("/getChaincodeData/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.getDataFromChaincode))).Methods("GET")
+	//router.Handle("/getChaincodeData/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.getDataFromChaincode))).Methods("GET")
 
 	/* Participants */
-	router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.saveParticipant))).Methods("POST")
-	router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.getParticipants))).Methods("GET")
+	//router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.saveParticipant))).Methods("POST")
+	//router.Handle("/participants", middleware.AuthMiddleware(http.HandlerFunc(app.getParticipants))).Methods("GET")
 
 	/* Assets */
-	router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.saveAsset))).Methods("POST")
-	router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.getAssets))).Methods("GET")
+	//router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.saveAsset))).Methods("POST")
+	//router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.getAssets))).Methods("GET")
 
 	/* Infrastructure */
-	router.Handle("/installChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.installChainCode))).Methods("POST")
-	router.Handle("/instantiateChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.instantiateChainCode))).Methods("GET")
+	//router.Handle("/installChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.installChainCode))).Methods("POST")
+	//router.Handle("/instantiateChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.instantiateChainCode))).Methods("GET")
 
 	/* ISSUES */
 	//router.HandleFunc("/issues", authentication).Methods("GET")
@@ -182,4 +183,60 @@ func main() {
 	//start server
 	log.Fatal(http.ListenAndServe(":"+port, &CORSRouterDecorator{router}))
 
+}
+
+func populateWallet(wallet *gateway.Wallet) error {
+
+	credPath := filepath.Join(
+		"/",
+		"home",
+		"ubuntu",
+		"go",
+		"src",
+		"github.com",
+		"sumaikun",
+		"apeslogistic-rest-api",
+		"fixtures",
+		"crypto-config",
+		"peerOrganizations",
+		"budget.com",
+		"users",
+		"User1@budget.com",
+		"msp",
+	)
+
+	//credPath += "/" + credPath
+
+	//fmt.Println(credPath)
+
+	certPath := filepath.Join(credPath, "signcerts", "User1@budget.com-cert.pem")
+	// read the certificate pem
+	cert, err := ioutil.ReadFile(filepath.Clean(certPath))
+	if err != nil {
+		return err
+	}
+
+	keyDir := filepath.Join(credPath, "keystore")
+	// there's a single file in this dir containing the private key
+
+	files, err := ioutil.ReadDir(keyDir)
+	if err != nil {
+		return err
+	}
+	if len(files) != 1 {
+		return errors.New("keystore folder should have contain one file")
+	}
+	keyPath := filepath.Join(keyDir, files[0].Name())
+	key, err := ioutil.ReadFile(filepath.Clean(keyPath))
+	if err != nil {
+		return err
+	}
+
+	identity := gateway.NewX509Identity("BudgetMSP", string(cert), string(key))
+
+	err = wallet.Put("appUser", identity)
+	if err != nil {
+		return err
+	}
+	return nil
 }
