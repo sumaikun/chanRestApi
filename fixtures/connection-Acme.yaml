@@ -1,0 +1,61 @@
+---
+name: apeschain
+version: 1.0.0
+client:
+  organization: Acme
+  connection:
+    timeout:
+      peer:
+        endorser: '300'
+organizations:
+  Acme:
+    mspid: AcmeMSP
+    peers:
+    - peer1.acme.com
+    certificateAuthorities:
+    - ca.acme.com
+peers:
+  peer1.acme.com:
+    url: grpc://172.25.0.4:7051
+    tlsCACerts:
+      pem: |
+        -----BEGIN CERTIFICATE-----
+        MIICNzCCAd2gAwIBAgIQPTGgs/Y0KPydrEHbVj1oXTAKBggqhkjOPQQDAjBmMQsw
+        CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNU2FuIEZy
+        YW5jaXNjbzERMA8GA1UEChMIYWNtZS5jb20xFzAVBgNVBAMTDnRsc2NhLmFjbWUu
+        Y29tMB4XDTIwMDkwMzAzMjgwMFoXDTMwMDkwMTAzMjgwMFowZjELMAkGA1UEBhMC
+        VVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBGcmFuY2lzY28x
+        ETAPBgNVBAoTCGFjbWUuY29tMRcwFQYDVQQDEw50bHNjYS5hY21lLmNvbTBZMBMG
+        ByqGSM49AgEGCCqGSM49AwEHA0IABAyZozDohcNQWmml1Rk5N8hzTOs4OTEFhPPK
+        N5W7aZdcbBFnso8MlV2K2ZsF3sIsYZ6tvOclIvaIJTD4kJtPNrKjbTBrMA4GA1Ud
+        DwEB/wQEAwIBpjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwDwYDVR0T
+        AQH/BAUwAwEB/zApBgNVHQ4EIgQg+I0EHpnUggUcJIrp5jsiIy6nP+XhIOxZ2Pcj
+        BlTfc7IwCgYIKoZIzj0EAwIDSAAwRQIgVXLJ8GoBC0uYF5RUkx58VuRBm5Ik6Q9r
+        CGUJasd9NjsCIQDVetS4lNrZEGRez9v8SKeckhN0g9B2+bjpzN8SYDjXkg==
+        -----END CERTIFICATE-----
+    grpcOptions:
+      ssl-target-name-override: peer1.acme.com
+      hostnameOverride: peer1.acme.com
+certificateAuthorities:
+  ca.acme.com:
+    url: http://172.25.0.4:7054
+    caName: ca.acme.com
+    tlsCACerts:
+      pem:
+      - |
+        -----BEGIN CERTIFICATE-----
+        MIICMTCCAdigAwIBAgIRAMJ3hNctpTZD4PofrmLnjggwCgYIKoZIzj0EAwIwYzEL
+        MAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBG
+        cmFuY2lzY28xETAPBgNVBAoTCGFjbWUuY29tMRQwEgYDVQQDEwtjYS5hY21lLmNv
+        bTAeFw0yMDA5MDMwMzI4MDBaFw0zMDA5MDEwMzI4MDBaMGMxCzAJBgNVBAYTAlVT
+        MRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1TYW4gRnJhbmNpc2NvMREw
+        DwYDVQQKEwhhY21lLmNvbTEUMBIGA1UEAxMLY2EuYWNtZS5jb20wWTATBgcqhkjO
+        PQIBBggqhkjOPQMBBwNCAATkvgqMrqVrQ7/+uId+lfM07C+UhWpfTZw3XZopdiwh
+        +KSOG0SegtaFw4j48mcRkl7GsmR3ktoIOdXx/zbVZqwFo20wazAOBgNVHQ8BAf8E
+        BAMCAaYwHQYDVR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMA8GA1UdEwEB/wQF
+        MAMBAf8wKQYDVR0OBCIEIMJg4E8zt1GBp5BqL7Oc9w5gNZSuubtW3zkwX1fZHooV
+        MAoGCCqGSM49BAMCA0cAMEQCIEWgraS6hoXRv6fNkUrVX54gbSp0IeGgZu9LYjWC
+        jigkAiBwDldaTCGyuOJMERGGmdMCQvn4hugcZlNcxrbXG7CM+g==
+        -----END CERTIFICATE-----
+    httpOptions:
+      verify: false

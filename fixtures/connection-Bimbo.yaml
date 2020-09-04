@@ -1,0 +1,63 @@
+---
+name: apeschain
+version: 1.0.0
+client:
+  organization: Bimbo
+  connection:
+    timeout:
+      peer:
+        endorser: '300'
+organizations:
+  Bimbo:
+    mspid: BimboMSP
+    peers:
+    - grupobimbo.com
+    certificateAuthorities:
+    - ca.grupobimbo.com
+peers:
+  grupobimbo.com:
+    url: grpc://54.224.143.239:7051
+    tlsCACerts:
+      pem: |
+        -----BEGIN CERTIFICATE-----
+        MIICUDCCAfagAwIBAgIRAP6clvCXR9SAenEIjdKM6KowCgYIKoZIzj0EAwIwcjEL
+        MAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBG
+        cmFuY2lzY28xFzAVBgNVBAoTDmdydXBvYmltYm8uY29tMR0wGwYDVQQDExR0bHNj
+        YS5ncnVwb2JpbWJvLmNvbTAeFw0yMDA4MjUyMTUyMDBaFw0zMDA4MjMyMTUyMDBa
+        MHIxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1T
+        YW4gRnJhbmNpc2NvMRcwFQYDVQQKEw5ncnVwb2JpbWJvLmNvbTEdMBsGA1UEAxMU
+        dGxzY2EuZ3J1cG9iaW1iby5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASn
+        YFFvvo3VJ8gt8gytbWnJFWsVtcdOqmiPWVzJNCZP8dND3SRlyIcM19yL2RtY4GlC
+        8P8q+Xs+mXS+7lAojXUAo20wazAOBgNVHQ8BAf8EBAMCAaYwHQYDVR0lBBYwFAYI
+        KwYBBQUHAwIGCCsGAQUFBwMBMA8GA1UdEwEB/wQFMAMBAf8wKQYDVR0OBCIEIB/o
+        y1EVPcyuh6qNotX0JWrHxTFeXSyPL3xKKS4bu+G+MAoGCCqGSM49BAMCA0gAMEUC
+        IQDyRbath9MB59FtdVQ8UAjxLtD0UkabRFgc3G1OHmv8PwIgPp8/K4+7aOKcjx7W
+        ZeamcwWYIfksccJR5gHHN2HS53M=
+        -----END CERTIFICATE-----
+    grpcOptions:
+      ssl-target-name-override: grupobimbo.com
+      hostnameOverride: grupobimbo.com
+certificateAuthorities:
+  ca.grupobimbo.com:
+    url: http://54.224.143.239:7054
+    caName: ca-Bimbo
+    tlsCACerts:
+      pem:
+      - |
+        -----BEGIN CERTIFICATE-----
+        MIICSjCCAfCgAwIBAgIRAKvnGsBeJb0Oz3GhGGV6n68wCgYIKoZIzj0EAwIwbzEL
+        MAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBG
+        cmFuY2lzY28xFzAVBgNVBAoTDmdydXBvYmltYm8uY29tMRowGAYDVQQDExFjYS5n
+        cnVwb2JpbWJvLmNvbTAeFw0yMDA4MjUyMTUyMDBaFw0zMDA4MjMyMTUyMDBaMG8x
+        CzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1TYW4g
+        RnJhbmNpc2NvMRcwFQYDVQQKEw5ncnVwb2JpbWJvLmNvbTEaMBgGA1UEAxMRY2Eu
+        Z3J1cG9iaW1iby5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAR3keeSPPBK
+        7G+iuSex7pcy1yN3EmyYEV7X9YUwHrF1pFVuKPja5unZephozQFv3+BISK9yyoAl
+        2tE8zbBTPUO1o20wazAOBgNVHQ8BAf8EBAMCAaYwHQYDVR0lBBYwFAYIKwYBBQUH
+        AwIGCCsGAQUFBwMBMA8GA1UdEwEB/wQFMAMBAf8wKQYDVR0OBCIEIFGMv0yOP29N
+        ptYkUvxXX5I25X+Ld99qHVZ2//WHBEaxMAoGCCqGSM49BAMCA0gAMEUCIEXBly3K
+        lYheXFNGqd5c7mnvr9+vVr6OuUwDz9RdzwUGAiEAmmF7HS/MhXq9ig7zPsDrVUa8
+        /Z2V4W4UmzhZQQmkFF8=
+        -----END CERTIFICATE-----
+    httpOptions:
+      verify: false
