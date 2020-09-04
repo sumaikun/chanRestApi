@@ -129,6 +129,13 @@ func main() {
 	}
 	fmt.Println(string(result))
 
+	result, err = contract.SubmitTransaction("invoke", "hello", "world")
+	if err != nil {
+		fmt.Printf("Failed to submit transaction: %s\n", err)
+		os.Exit(1)
+	}
+	fmt.Println(string(result))
+
 	app := Application{
 		gway: gw,
 	}

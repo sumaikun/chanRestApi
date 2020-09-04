@@ -415,7 +415,7 @@ func (app *Application) queryHelloChainCode(w http.ResponseWriter, r *http.Reque
 	network, err := app.gway.GetNetwork("airlinechannel")
 	if err != nil {
 		fmt.Printf("Failed to get network: %s\n", err)
-		os.Exit(1)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err.Error())
 	}
 
 	fmt.Println(network)
@@ -425,7 +425,7 @@ func (app *Application) queryHelloChainCode(w http.ResponseWriter, r *http.Reque
 	result, err := contract.EvaluateTransaction("query", "hello")
 	if err != nil {
 		fmt.Printf("Failed to evaluate transaction: %s\n", err)
-		os.Exit(1)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err.Error())
 	}
 
 	fmt.Printf("Response from the query hello: %s\n", result)
@@ -446,7 +446,7 @@ func (app *Application) invokeHelloChaincode(w http.ResponseWriter, r *http.Requ
 	network, err := app.gway.GetNetwork("airlinechannel")
 	if err != nil {
 		fmt.Printf("Failed to get network: %s\n", err)
-		os.Exit(1)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err.Error())
 	}
 
 	fmt.Println(network)
@@ -456,7 +456,7 @@ func (app *Application) invokeHelloChaincode(w http.ResponseWriter, r *http.Requ
 	result, err := contract.SubmitTransaction("invoke", "hello", params["word"])
 	if err != nil {
 		fmt.Printf("Failed to submit transaction: %s\n", err)
-		os.Exit(1)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err.Error())
 	}
 
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": string(result)})
@@ -469,7 +469,7 @@ func (app *Application) historyHelloChainCode(w http.ResponseWriter, r *http.Req
 	network, err := app.gway.GetNetwork("airlinechannel")
 	if err != nil {
 		fmt.Printf("Failed to get network: %s\n", err)
-		os.Exit(1)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err.Error())
 	}
 
 	fmt.Println(network)
@@ -479,7 +479,7 @@ func (app *Application) historyHelloChainCode(w http.ResponseWriter, r *http.Req
 	result, err := contract.EvaluateTransaction("history", "hello")
 	if err != nil {
 		fmt.Printf("Failed to evaluate transaction: %s\n", err)
-		os.Exit(1)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, err.Error())
 	}
 
 	fmt.Printf("Response from the history hello: %s\n", result)
