@@ -39,7 +39,7 @@ func (setup *FabricSetup) HistoryKey(key string) ([]byte, error) {
 
 	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1])}})
 	if err != nil {
-		return "", fmt.Errorf("failed to query history: %v", err)
+		return nil, fmt.Errorf("failed to query history: %v", err)
 	}
 
 	return response.Payload, nil
