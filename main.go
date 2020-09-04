@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	//"github.com/chainHero/heroes-service/blockchain"
 	"github.com/gorilla/mux"
@@ -26,41 +25,21 @@ var (
 
 var dao = Dao.MongoConnector{}
 
-/*var fSetup = blockchain.FabricSetup{
-	// Network parameters
-	OrdererID: "orderer.hf.chainhero.io",
-
-	// Channel parameters
-	ChannelID:     "chainhero",
-	ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/chainHero/heroes-service/fixtures/artifacts/chainhero.channel.tx",
-
-	// Chaincode parameters
-	ChainCodeID:     "heroes-service",
-	ChaincodeGoPath: os.Getenv("GOPATH"),
-	ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/chaincode/",
-	OrgAdmin:        "Admin",
-	OrgName:         "org1",
-	ConfigFile:      "config.yaml",
-
-	// User parameters
-	UserName: "User1",
-}*/
-
 var fSetup = blockchain.FabricSetup{
 	// Network parameters
-	OrdererID: "orderer.technoapes.co",
+	OrdererID: "orderer.acme.com",
 
 	// Channel parameters
-	ChannelID:     "apeschannel",
-	ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/sumaikun/apeslogistic-rest-api/fixtures/artifacts/apes-channel.tx",
+	ChannelID: "airlinechannel",
+	//ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/sumaikun/apeslogistic-rest-api/fixtures/artifacts/apes-channel.tx",
 
 	// Chaincode parameters
-	ChainCodeID:     "apeschain",
-	ChaincodeGoPath: os.Getenv("GOPATH"),
-	ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/chaincode/",
-	OrgAdmin:        "Admin",
-	OrgName:         "apes",
-	ConfigFile:      "config.yaml",
+	ChainCodeID: "gocc1",
+	//ChaincodeGoPath: os.Getenv("GOPATH"),
+	//ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/chaincode/",
+	OrgAdmin:   "Admin",
+	OrgName:    "apes",
+	ConfigFile: "config.yaml",
 
 	// User parameters
 	UserName: "User1",
@@ -119,13 +98,6 @@ func main() {
 	// Close SDK
 	defer fSetup.CloseSDK()
 
-	// Install and instantiate the chaincode
-	/*err = fSetup.InstallAndInstantiateCC()
-	if err != nil {
-		fmt.Printf("Unable to install and instantiate the chaincode: %v\n", err)
-		return
-	}*/
-
 	app := Application{
 		Fabric: &fSetup,
 	}
@@ -170,8 +142,8 @@ func main() {
 	router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.getAssets))).Methods("GET")
 
 	/* Infrastructure */
-	router.Handle("/installChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.installChainCode))).Methods("POST")
-	router.Handle("/instantiateChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.instantiateChainCode))).Methods("GET")
+	//router.Handle("/installChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.installChainCode))).Methods("POST")
+	//router.Handle("/instantiateChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.instantiateChainCode))).Methods("GET")
 
 	/* ISSUES */
 	//router.HandleFunc("/issues", authentication).Methods("GET")

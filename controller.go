@@ -589,7 +589,7 @@ func (app *Application) getAssets(w http.ResponseWriter, r *http.Request) {
 
 //------------------------ Fabric infraestricture services
 
-func (app *Application) installChainCode(w http.ResponseWriter, r *http.Request) {
+/*func (app *Application) installChainCode(w http.ResponseWriter, r *http.Request) {
 	err := app.Fabric.InstallAndInstantiateCC()
 	if err != nil {
 		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
@@ -609,4 +609,4 @@ func (app *Application) instantiateChainCode(w http.ResponseWriter, r *http.Requ
 
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "chaincode instantiated"})
 	return
-}
+}*/

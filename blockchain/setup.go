@@ -85,19 +85,40 @@ func (setup *FabricSetup) Initialize() error {
 	args = append(args, "query")
 	args = append(args, "hello")
 
-	response, err := setup.client.Execute(
-		channel.Request{
-			ChaincodeID: setup.ChainCodeID,
-			Fcn:         args[0],
-			Args:        [][]byte{[]byte(args[1])},
-		},
-	)
-
+	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1])}})
 	if err != nil {
-		return errors.WithMessage(err, "failed execute chaincode")
+		fmt.Errorf("failed to query: %v", err)
+		return errors.WithMessage(err, "failed to query")
 	}
 
-	fmt.Println(response)
+	fmt.Println("query", response)
+
+	var args2 []string
+	args2 = append(args2, "invoke")
+	args2 = append(args2, "hello")
+	args2 = append(args2, "helloapes")
+
+	eventID := "eventInvoke"
+
+	// Add data that will be visible in the proposal, like a description of the invoke request
+	transientDataMap := make(map[string][]byte)
+	transientDataMap["result"] = []byte("Transient data in hello invoke")
+
+	reg, _, err := setup.event.RegisterChaincodeEvent(setup.ChainCodeID, eventID)
+	if err != nil {
+		fmt.Errorf("failed to register event: %v", err)
+		return errors.WithMessage(err, "failed to register event")
+	}
+	defer setup.event.Unregister(reg)
+
+	// Create a request (proposal) and send it
+	response, err = setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args2[0], Args: [][]byte{[]byte(args2[1]), []byte(args2[2])}, TransientMap: transientDataMap})
+	if err != nil {
+		fmt.Errorf("failed to invoke: %v", err)
+		return errors.WithMessage(err, "failed to invoke")
+	}
+
+	fmt.Println("invoke", response)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
