@@ -27,7 +27,7 @@ func (setup *FabricSetup) HistoryHello() (string, error) {
 }
 
 // HistoryKey method example
-func (setup *FabricSetup) HistoryKey(key string) (string, error) {
+func (setup *FabricSetup) HistoryKey(key string) ([]byte, error) {
 
 	// Prepare arguments
 	var args []string
