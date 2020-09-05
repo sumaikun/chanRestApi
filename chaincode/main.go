@@ -100,6 +100,11 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.history(stub, args)
 	}
 
+	// Check historian
+	if function == "historyKey" {
+		return t.historyKey(stub, args)
+	}
+
 	// Check key
 	if function == "getData" {
 		return t.getData(stub, args)
