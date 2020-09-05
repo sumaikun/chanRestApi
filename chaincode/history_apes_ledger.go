@@ -53,7 +53,7 @@ func (t *ApesChainCode) historyKey(stub shim.ChaincodeStubInterface, args []stri
 		bArrayMemberAlreadyWritten = true
 	}
 
-	rbuffer.WriteString("]")
+	buffer.WriteString("]")
 
 	return shim.Success(buffer.Bytes())
 }
