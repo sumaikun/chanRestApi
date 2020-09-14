@@ -147,7 +147,7 @@ func (t *ApesWallet) makeExternalPayment(stub shim.ChaincodeStubInterface, args 
 		if updateOwner.Balance < quantity
 		{
 			externalPayment := &ExternalPayment{ "externalPayment", fromExternal, toWallet, "failed", date, quantity, type, identification }
-			externalPaymentJSONasBytes, err := json.Marshal(externalAgent)
+			externalPaymentJSONasBytes, err := json.Marshal(externalPayment)
 			if err != nil {
 				return shim.Error(err.Error())
 			}		
@@ -238,5 +238,182 @@ func (t *ApesWallet) makeExternalPayment(stub shim.ChaincodeStubInterface, args 
 	}
 
 	return shim.Success(nil)
+
+}
+
+
+func (t *ApesWallet) makeWalletPayment(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	fmt.Println("########### ApesWallet makeWalletPayment ###########")
+	var err error
+
+	// 0 ,             1,        2,      3,        4,          
+	// FromWallet,  ToWallet, date, quantity,  identification
+
+	if len(args) != 5 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+	if len(args[0]) <= 0 {
+		return shim.Error("fromWallet argument must be a non-empty string")
+	}
+
+	if len(args[1]) <= 0 {
+		return shim.Error("toWallet argument must be a non-empty string")
+	}
+
+	if len(args[2]) <= 0 {
+		return shim.Error("date argument must be a non-empty string")
+	}
+
+	if len(args[3]) <= 0 {
+		return shim.Error("quantity argument must be a non-empty string")
+	}
+
+	if len(args[4]) <= 0 {
+		return shim.Error("identification argument must be a non-empty string")
+	}	
+
+	fromWallet := args[0]
+
+	fromWalletAsBytes, err := stub.GetState(fromWallet)
+	if err != nil {
+		return shim.Error("Failed to get  from wallet: " + err.Error())
+	} else if externalAgentAsBytes == nil {
+		return shim.Error("This wallet dont exists: " + fromWallet)
+	}
+
+	toWallet := args[1]
+
+	toWalletAsBytes, err := stub.GetState(toWallet)
+	if err != nil {
+		return shim.Error("Failed to get reception owner wallet: " + err.Error())
+	} else if ownerAsBytes == nil {
+		//fmt.Println("This externalAgent already exists: " + identification)
+		return shim.Error("This owner wallet dont exists: " + toWallet)
+	}
+
+	updateFromOwner := Owner{}
+	_ = json.Unmarshal(fromWalletAsBytes, &updateFromOwner)
+
+
+	updateToOwner := Owner{}
+	_ = json.Unmarshal(toWalletAsBytes, &updateToOwner)
+
+	date := args[2]
+
+	quantity, err := strconv.Atoi(args[3])
+
+	if err != nil {
+		return shim.Error("quantity argument must be a numeric string")
+	}
+
+	identification := args[4]
+
+	if updateFromOwner.Balance < quantity{
+		
+		
+		walletPayment := &WalletPayment{ "walletPayment", fromWallet, toWallet, "failed", date, quantity, identification }
+		walletPaymentJSONasBytes, err := json.Marshal(walletPayment)
+		if err != nil {
+			return shim.Error(err.Error())
+		}		
+
+		err = stub.PutState(identification, walletPaymentJSONasBytes)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		indexName := "type~identification"
+		typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{"walletPayment", identification})
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		value := []byte{0x00}
+		stub.PutState(typeIndexKey, value)
+
+		indexName := "fromWallet~walletPayment"
+		typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{updateFromOwner.Identification, identification})
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		value := []byte{0x00}
+		stub.PutState(typeIndexKey, value)
+
+
+		indexName := "toWallet~walletPayment"
+		typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{updateToOwner.Identification, identification})
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		value := []byte{0x00}
+		stub.PutState(typeIndexKey, value)
+		
+		return shim.Error("not enought fonds  for this wallet payment")
+	}else{
+		
+		updateFromOwner.Balance = updateOwner.Balance - quantity 
+
+		walletPayment := &WalletPayment{ "walletPayment", fromWallet, toWallet, "failed", date, quantity, identification }
+		walletPaymentJSONasBytes, err := json.Marshal(walletPayment)
+		if err != nil {
+			return shim.Error(err.Error())
+		}		
+
+		err = stub.PutState(identification, walletPaymentJSONasBytes)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		updateFromOwnerJSONasBytes, err := json.Marshal(updateFromOwner)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		err = stub.PutState(updateFromOwner.Identification, updateFromOwnerJSONasBytes)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		updateToOwner.Balance = updateToOwner.Balance + quantity 
+
+		updateToOwnerJSONasBytes, err := json.Marshal(updateToOwner)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		err = stub.PutState(updateToOwner.Identification, updateToOwnerJSONasBytes)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		indexName := "type~identification"
+		typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{"walletPayment", identification})
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		value := []byte{0x00}
+		stub.PutState(typeIndexKey, value)
+
+		indexName := "fromWallet~walletPayment"
+		typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{updateFromOwner.Identification, identification})
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		value := []byte{0x00}
+		stub.PutState(typeIndexKey, value)
+
+
+		indexName := "toWallet~walletPayment"
+		typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{updateToOwner.Identification, identification})
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		value := []byte{0x00}
+		stub.PutState(typeIndexKey, value)
+
+	}
+
+	return shim.Success(nil)
+
 
 }

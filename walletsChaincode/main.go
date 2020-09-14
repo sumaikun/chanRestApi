@@ -35,11 +35,11 @@ type ExternalAgent struct {
 // WalletPayment representation in chaincode
 type WalletPayment struct {
 	ObjectType     string `json:"docType"`
-	From           string `json:"from"`
-	To             string `json:"to"`
+	FromWallet     string `json:"from"`
+	ToWallet       string `json:"to"`
+	State          string `json:"state"`
 	Date           string `json:"date"`
 	Quantity       string `json:"quantity"`
-	Type           string `json:"type"`
 	Identification string `json:"identification"`
 }
 
