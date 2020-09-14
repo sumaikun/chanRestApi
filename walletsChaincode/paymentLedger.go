@@ -94,10 +94,14 @@ func (t *ApesWallet) makeExternalPayment(stub shim.ChaincodeStubInterface, args 
 	}
 
 	if containtType == "PAY"{
+
 		updateOwner.Balance = updateOwner.Balance + quantity 
 
-		externalPayment := &ExternalPayment{ "externalPayment", fromExternal, toWallet, "success", date, quantity, type, identification }
-		externalPaymentJSONasBytes, err := json.Marshal(externalAgent)
+		objectType := "externalPayment"		
+		state := "success"
+
+		externalPayment := &ExternalPayment{ , fromExternal, toWallet, state, date, quantity, type, identification }
+		externalPaymentJSONasBytes, err := json.Marshal(externalPayment)
 		if err != nil {
 			return shim.Error(err.Error())
 		}		
@@ -145,7 +149,11 @@ func (t *ApesWallet) makeExternalPayment(stub shim.ChaincodeStubInterface, args 
 	}else{
 		if updateOwner.Balance < quantity
 		{
-			externalPayment := &ExternalPayment{ "externalPayment", fromExternal, toWallet, "failed", date, quantity, type, identification }
+			objectType := "externalPayment"
+		
+			state := "failed"
+
+			externalPayment := &ExternalPayment{ objectType, fromExternal, toWallet, state, date, quantity, type, identification }
 			externalPaymentJSONasBytes, err := json.Marshal(externalPayment)
 			if err != nil {
 				return shim.Error(err.Error())
@@ -186,7 +194,11 @@ func (t *ApesWallet) makeExternalPayment(stub shim.ChaincodeStubInterface, args 
 			
 			updateOwner.Balance = updateOwner.Balance - quantity 
 
-			externalPayment := &ExternalPayment{ "externalPayment", fromExternal, toWallet, "success", date, quantity, type, identification }
+			objectType := "externalPayment"
+		
+			state := "success"
+
+			externalPayment := &ExternalPayment{ objectType, fromExternal, toWallet, state, date, quantity, type, identification }
 			externalPaymentJSONasBytes, err := json.Marshal(externalAgent)
 			if err != nil {
 				return shim.Error(err.Error())
