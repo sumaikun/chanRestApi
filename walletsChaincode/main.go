@@ -138,9 +138,29 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.saveOwner(stub, args)
 	}
 
-	// saveOwner
+	// saveExternalAgent
 	if function == "saveExternalAgent" {
 		return t.saveExternalAgent(stub, args)
+	}
+
+	// saveEvent
+	if function == "saveEvent" {
+		return t.saveEven(stub, args)
+	}
+
+	// saveRule
+	if function == "saveRule" {
+		return t.saveRule(stub, args)
+	}
+
+	// makeExternalPayment
+	if function == "makeExternalPayment" {
+		return t.makeExternalPayment(stub, args)
+	}
+
+	// makeWalletPayment
+	if function == "makeWalletPayment" {
+		return t.makeWalletPayment(stub, args)
 	}
 
 	// If the arguments given don’t match any function, we return an error
