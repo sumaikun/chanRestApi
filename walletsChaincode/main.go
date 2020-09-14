@@ -21,7 +21,7 @@ type Owner struct {
 	Identification string `json:"identification"`
 	PhotoURL       string `json:"photoUrl"`
 	Notes          string `json:"notes"`
-	Balance        string `json:"balance"`
+	Balance        int    `json:"balance"`
 }
 
 // ExternalAgent representation in chaincode
@@ -39,7 +39,7 @@ type WalletPayment struct {
 	ToWallet       string `json:"to"`
 	State          string `json:"state"`
 	Date           string `json:"date"`
-	Quantity       string `json:"quantity"`
+	Quantity       int    `json:"quantity"`
 	Identification string `json:"identification"`
 }
 
@@ -79,8 +79,8 @@ type Rule struct {
 // Init of the chaincode
 // This function is called only one when the chaincode is instantiated.
 // So the goal is to prepare the ledger to handle future requests.
-func (t *ApesChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	fmt.Println("########### ApesChainCode Init with changes ###########")
+func (t *ApesWallet) Init(stub shim.ChaincodeStubInterface) pb.Response {
+	fmt.Println("########### ApesWallet Init with changes ###########")
 
 	// Get the function and arguments from the request
 	function, _ := stub.GetFunctionAndParameters()
@@ -96,8 +96,8 @@ func (t *ApesChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
 
 // Invoke
 // All future requests named invoke will arrive here.
-func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
-	fmt.Println("########### ApesChainCode Invoke ###########")
+func (t *ApesWallet) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
+	fmt.Println("########### ApesWallet Invoke ###########")
 
 	// Get the function and arguments from the request
 	function, args := stub.GetFunctionAndParameters()
@@ -123,14 +123,9 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.getData(stub, args)
 	}
 
-	// Get data result from objectType
-	if function == "getObjectType" {
-		return t.getObjectType(stub, args)
-	}
-
-	// saveOwner
-	if function == "getObjectType" {
-		return t.saveOwner(stub, args)
+	// getObjectTypeWithKey
+	if function == "getObjectTypeWithKey" {
+		return t.getObjectTypeWithKey(stub, args)
 	}
 
 	// saveOwner
@@ -145,7 +140,7 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 	// saveEvent
 	if function == "saveEvent" {
-		return t.saveEven(stub, args)
+		return t.saveEvent(stub, args)
 	}
 
 	// saveRule

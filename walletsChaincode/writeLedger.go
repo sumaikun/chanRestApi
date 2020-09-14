@@ -67,7 +67,7 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 		//return shim.Error("This owner already exists: " + identification)
 	}
 
-	owner := &Owner{objectType, name, nationality, address, phone, identification, photoURL, notes}
+	owner := &Owner{objectType, name, nationality, address, phone, identification, photoURL, notes, balance}
 	ownerJSONasBytes, err := json.Marshal(owner)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -225,7 +225,7 @@ func (t *ApesWallet) saveEvent(stub shim.ChaincodeStubInterface, args []string) 
 		//return shim.Error("This externalAgent already exists: " + identification)
 	}
 
-	event := &Event{objectType, name, description, identification}
+	event := &Event{objectType, fromExternal, fromWallet, toWallet, toExternal}
 	eventJSONasBytes, err := json.Marshal(event)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -327,7 +327,7 @@ func (t *ApesWallet) saveRule(stub shim.ChaincodeStubInterface, args []string) p
 		keyRule = event + "-rule-" + toExternal
 	}
 
-	ruleAsBytes, err := stub.GetState(keyEvent)
+	ruleAsBytes, err := stub.GetState(keyRule)
 
 	if err != nil {
 		return shim.Error("Failed to get rule: " + err.Error())
@@ -362,12 +362,12 @@ func (t *ApesWallet) saveRule(stub shim.ChaincodeStubInterface, args []string) p
 	value := []byte{0x00}
 	stub.PutState(typeIndexKey, value)
 
-	indexName := "event~rule"
-	typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{event, keyRule})
+	indexName = "event~rule"
+	typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{event, keyRule})
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	value := []byte{0x00}
+	value = []byte{0x00}
 	stub.PutState(typeIndexKey, value)
 
 	return shim.Success(nil)
