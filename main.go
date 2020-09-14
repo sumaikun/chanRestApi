@@ -35,9 +35,9 @@ var fSetup = blockchain.FabricSetup{
 	ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/chainHero/heroes-service/fixtures/artifacts/chainhero.channel.tx",
 
 	// Chaincode parameters
-	ChainCodeID:     "heroes-service",
+	ChainCodeID:     "heroes-wallet",
 	ChaincodeGoPath: os.Getenv("GOPATH"),
-	ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/chaincode/",
+	ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/walletsChaincode/",
 	OrgAdmin:        "Admin",
 	OrgName:         "org1",
 	ConfigFile:      "config.yaml",

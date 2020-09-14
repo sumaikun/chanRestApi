@@ -93,8 +93,7 @@ func (t *ApesWallet) makeExternalPayment(stub shim.ChaincodeStubInterface, args 
 		return shim.Error("The " + containtType + " field must be a valid value for payment type Enum")
 	}
 
-	if containtType == "PAY"
-	{
+	if containtType == "PAY"{
 		updateOwner.Balance = updateOwner.Balance + quantity 
 
 		externalPayment := &ExternalPayment{ "externalPayment", fromExternal, toWallet, "success", date, quantity, type, identification }
