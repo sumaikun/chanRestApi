@@ -813,7 +813,7 @@ func (app *Application) saveEvent(w http.ResponseWriter, r *http.Request) {
 
 func (app *Application) getEvents(w http.ResponseWriter, r *http.Request) {
 
-	response, err := app.Fabric.QueryObjectType2("owner")
+	response, err := app.Fabric.QueryObjectType2("event")
 	if err != nil {
 		fmt.Printf("Unable to query  the chaincode: %v\n", err)
 		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
