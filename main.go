@@ -164,8 +164,8 @@ func main() {
 	router.Handle("/walletExternalAgents", middleware.AuthMiddleware(http.HandlerFunc(app.getExternalAgents))).Methods("GET")
 
 	/* Wallets Events */
-	router.Handle("/walletEvents", middleware.AuthMiddleware(http.HandlerFunc(app.saveEvent)).Methods("POST")
-	router.Handle("/walletEvents", middleware.AuthMiddleware(http.HandlerFunc(app.getEvents)).Methods("GET")
+	router.Handle("/walletEvents", middleware.AuthMiddleware(http.HandlerFunc(app.saveEvent))).Methods("POST")
+	router.Handle("/walletEvents", middleware.AuthMiddleware(http.HandlerFunc(app.getEvents))).Methods("GET")
 
 	/* Wallets Rules */
 	router.Handle("/walletRules", middleware.AuthMiddleware(http.HandlerFunc(app.saveRule))).Methods("POST")
