@@ -14,8 +14,8 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 	fmt.Println("########### ApesWallet create Owner ###########")
 	var err error
 
-	// 0 ,    1,           2,       3,     4,             5,        6      7
-	// name,  nationality, address, phone, identification, photoUrl, notes, balance
+	// 0 ,    1,           2,       3,     4,             5,        6
+	// name,  nationality, address, phone, identification, photoUrl, notes,
 
 	if len(args) != 7 {
 		return shim.Error("Incorrect number of arguments. Expecting 6")

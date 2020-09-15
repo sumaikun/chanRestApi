@@ -98,3 +98,104 @@ func assetValidator(r *http.Request) (map[string]interface{}, Models.Asset) {
 
 	return err, asset
 }
+
+func ownerValidator(r *http.Request) (map[string]interface{}, Models.Owner) {
+
+	var owner Models.Owner
+
+	rules := govalidator.MapData{
+		"name":           []string{"required"},
+		"nationality":    []string{"required"},
+		"address":        []string{"required"},
+		"phone":          []string{"required"},
+		"identification": []string{"required"},
+		"notes":          []string{"required"},
+	}
+
+	opts := govalidator.Options{
+		Request:         r,
+		Data:            &owner,
+		Rules:           rules,
+		RequiredDefault: true,
+	}
+
+	v := govalidator.New(opts)
+	e := v.ValidateJSON()
+	//fmt.Println(user)
+
+	err := map[string]interface{}{"validationError": e}
+
+	return err, owner
+}
+
+func externalAgentValidator(r *http.Request) (map[string]interface{}, Models.ExternalAgent) {
+
+	var externalAgent Models.ExternalAgent
+
+	rules := govalidator.MapData{
+		"name":           []string{"required"},
+		"description":    []string{"required"},
+		"identification": []string{"required"},
+	}
+
+	opts := govalidator.Options{
+		Request:         r,
+		Data:            &externalAgent,
+		Rules:           rules,
+		RequiredDefault: true,
+	}
+
+	v := govalidator.New(opts)
+	e := v.ValidateJSON()
+	//fmt.Println(user)
+
+	err := map[string]interface{}{"validationError": e}
+
+	return err, externalAgent
+}
+
+func eventValidator(r *http.Request) (map[string]interface{}, Models.Event) {
+
+	var event Models.Event
+
+	rules := govalidator.MapData{}
+
+	opts := govalidator.Options{
+		Request:         r,
+		Data:            &event,
+		Rules:           rules,
+		RequiredDefault: true,
+	}
+
+	v := govalidator.New(opts)
+	e := v.ValidateJSON()
+	//fmt.Println(user)
+
+	err := map[string]interface{}{"validationError": e}
+
+	return err, event
+}
+
+func rulesValidator(r *http.Request) (map[string]interface{}, Models.Rule) {
+
+	var rule Models.Rule
+
+	rules := govalidator.MapData{
+		"event": []string{"required"},
+	}
+
+	opts := govalidator.Options{
+		Request:         r,
+		Data:            &rule,
+		Rules:           rules,
+		RequiredDefault: true,
+	}
+
+	v := govalidator.New(opts)
+	e := v.ValidateJSON()
+	//fmt.Println(user)
+
+	err := map[string]interface{}{"validationError": e}
+
+	return err, rule
+}

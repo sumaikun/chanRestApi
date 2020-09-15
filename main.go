@@ -155,6 +155,22 @@ func main() {
 	router.Handle("/installChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.installChainCode))).Methods("POST")
 	router.Handle("/instantiateChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.instantiateChainCode))).Methods("GET")
 
+	/* Owners */
+	router.Handle("/walletOwners", middleware.AuthMiddleware(http.HandlerFunc(app.saveOwner))).Methods("POST")
+	router.Handle("/walletOwners", middleware.AuthMiddleware(http.HandlerFunc(app.getOwners))).Methods("GET")
+
+	/* External Agents */
+	router.Handle("/walletExternalAgents", middleware.AuthMiddleware(http.HandlerFunc(app.saveExternalAgent))).Methods("POST")
+	router.Handle("/walletExternalAgents", middleware.AuthMiddleware(http.HandlerFunc(app.getExternalAgents))).Methods("GET")
+
+	/* Wallets Events */
+	router.Handle("/walletEvents", middleware.AuthMiddleware(http.HandlerFunc(app.saveEvent)).Methods("POST")
+	router.Handle("/walletEvents", middleware.AuthMiddleware(http.HandlerFunc(app.getEvents)).Methods("GET")
+
+	/* Wallets Rules */
+	router.Handle("/walletRules", middleware.AuthMiddleware(http.HandlerFunc(app.saveRule))).Methods("POST")
+	router.Handle("/walletRules", middleware.AuthMiddleware(http.HandlerFunc(app.getRules))).Methods("GET")
+
 	/* ISSUES */
 	//router.HandleFunc("/issues", authentication).Methods("GET")
 

@@ -23,3 +23,70 @@ type Asset struct {
 	Date           string `json:"date"`
 	AssetType      string `json:"assetType"`
 }
+
+//------------------------------- wallet chaincode -------------------------
+
+// Owner representation in chaincode
+type Owner struct {
+	ObjectType     string `json:"docType"`
+	Name           string `json:"name"`
+	Nationality    string `json:"nationality"`
+	Address        string `json:"address"`
+	Phone          string `json:"phone"`
+	Identification string `json:"identification"`
+	PhotoURL       string `json:"photoUrl"`
+	Notes          string `json:"notes"`
+	Balance        int    `json:"balance"`
+}
+
+// ExternalAgent representation in chaincode
+type ExternalAgent struct {
+	ObjectType     string `json:"docType"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	Identification string `json:"identification"`
+}
+
+// WalletPayment representation in chaincode
+type WalletPayment struct {
+	ObjectType     string `json:"docType"`
+	FromWallet     string `json:"from"`
+	ToWallet       string `json:"to"`
+	State          string `json:"state"`
+	Date           string `json:"date"`
+	Quantity       int    `json:"quantity"`
+	Identification string `json:"identification"`
+}
+
+// ExternalPayment representation in chaincode
+type ExternalPayment struct {
+	ObjectType     string `json:"docType"`
+	FromExternal   string `json:"from"`
+	ToWallet       string `json:"to"`
+	State          string `json:"state"`
+	Date           string `json:"date"`
+	Quantity       int    `json:"quantity"`
+	PaymentType    string `json:"paymentType"`
+	Identification string `json:"identification"`
+}
+
+// Event representation in chaincode
+type Event struct {
+	ObjectType   string `json:"docType"`
+	FromExternal string `json:"fromExternal"`
+	FromWallet   string `json:"fromWallet"`
+	ToWallet     string `json:"toWallet"`
+	ToExternal   string `json:"toExternal"`
+}
+
+// Rule representation in chaincode
+type Rule struct {
+	ObjectType string `json:"docType"`
+	Event      string `json:"event"`
+	Fee        int    `json:"fee"`
+	ToWallet   string `json:"toWallet"`
+	ToExternal string `json:"toAgent"`
+	Date       string `json:"date"`
+	Quantity   int    `json:"quantity"`
+	State      bool   `json:"state"`
+}

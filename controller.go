@@ -637,3 +637,181 @@ func (app *Application) instantiateChainCode(w http.ResponseWriter, r *http.Requ
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "chaincode instantiated"})
 	return
 }
+
+//---------------------------  Wallet Chaincode ---------------------------- //
+
+func (app *Application) saveOwner(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, owner := ownerValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.SaveOwner(owner)
+	if err2 != nil {
+		fmt.Printf("Unable to save owner on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save owner transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) getOwners(w http.ResponseWriter, r *http.Request) {
+
+	response, err := app.Fabric.QueryObjectType2("owner")
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) saveExternalAgent(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, externalAgent := externalAgentValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.SaveExternalAgent(externalAgent)
+	if err2 != nil {
+		fmt.Printf("Unable to save external agent on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save external agent transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) getExternalAgents(w http.ResponseWriter, r *http.Request) {
+
+	response, err := app.Fabric.QueryObjectType2("externalAgent")
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) saveEvent(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, event := eventValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.SaveEvent(event)
+	if err2 != nil {
+		fmt.Printf("Unable to save event on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save event transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) getEvents(w http.ResponseWriter, r *http.Request) {
+
+	response, err := app.Fabric.QueryObjectType2("owner")
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) saveRule(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, rule := rulesValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.SaveRule(rule)
+	if err2 != nil {
+		fmt.Printf("Unable to save rule on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save rule transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) getRules(w http.ResponseWriter, r *http.Request) {
+
+	response, err := app.Fabric.QueryObjectType2("rule")
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}

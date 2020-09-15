@@ -58,19 +58,19 @@ type ExternalPayment struct {
 // Event representation in chaincode
 type Event struct {
 	ObjectType   string `json:"docType"`
-	fromExternal string `json:"fromExternal"`
-	fromWallet   string `json:"fromWallet"`
-	toWallet     string `json:"toWallet"`
-	toExternal   string `json:"toExternal"`
+	FromExternal string `json:"fromExternal"`
+	FromWallet   string `json:"fromWallet"`
+	ToWallet     string `json:"toWallet"`
+	ToExternal   string `json:"toExternal"`
 }
 
 // Rule representation in chaincode
 type Rule struct {
 	ObjectType string `json:"docType"`
 	Event      string `json:"event"`
-	fee        int    `json:"fee"`
+	Fee        int    `json:"fee"`
 	ToWallet   string `json:"toWallet"`
-	toExternal string `json:"toAgent"`
+	ToExternal string `json:"toAgent"`
 	Date       string `json:"date"`
 	Quantity   int    `json:"quantity"`
 	State      bool   `json:"state"`
