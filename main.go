@@ -155,6 +155,10 @@ func main() {
 	router.Handle("/installChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.installChainCode))).Methods("POST")
 	router.Handle("/instantiateChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.instantiateChainCode))).Methods("GET")
 
+	/*get data from  wallet chaincode */
+	router.HandleFunc("/getChaincodeData2/{key}", app.getDataFromChaincode2).Methods("GET")
+	router.Handle("/getHistoryForKey2/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.getHistoryForKey2))).Methods("GET")
+
 	/* Owners */
 	router.Handle("/walletOwners", middleware.AuthMiddleware(http.HandlerFunc(app.saveOwner))).Methods("POST")
 	router.Handle("/walletOwners", middleware.AuthMiddleware(http.HandlerFunc(app.getOwners))).Methods("GET")

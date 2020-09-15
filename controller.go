@@ -640,6 +640,66 @@ func (app *Application) instantiateChainCode(w http.ResponseWriter, r *http.Requ
 
 //---------------------------  Wallet Chaincode ---------------------------- //
 
+func (app *Application) getDataFromChaincode2(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+	}
+
+	defer r.Body.Close()
+
+	response, err := app.Fabric.QueryGetData2(params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	/*out, err := json.Marshal(response)
+	if err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}*/
+
+	var raw map[string]interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) getHistoryForKey2(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+	}
+
+	response, err := app.Fabric.HistoryKey2(params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
 func (app *Application) saveOwner(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

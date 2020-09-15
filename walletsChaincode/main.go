@@ -70,7 +70,7 @@ type Rule struct {
 	Event      string `json:"event"`
 	Fee        int    `json:"fee"`
 	ToWallet   string `json:"toWallet"`
-	ToExternal string `json:"toAgent"`
+	ToExternal string `json:"toExternal"`
 	Date       string `json:"date"`
 	Quantity   int    `json:"quantity"`
 	State      bool   `json:"state"`
