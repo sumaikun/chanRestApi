@@ -103,7 +103,7 @@ func (t *ApesWallet) saveExternalAgent(stub shim.ChaincodeStubInterface, args []
 	// 0 ,    1,          2
 	// name,  description, identification
 
-	if len(args) != 2 {
+	if len(args) != 3 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
 
