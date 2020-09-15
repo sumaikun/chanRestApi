@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
@@ -277,12 +278,12 @@ func (setup *FabricSetup) SaveRule(rule Models.Rule) (string, error) {
 	var args []string
 	args = append(args, "saveRule")
 	args = append(args, rule.Event)
-	args = append(args, rule.Fee)
+	args = append(args, strconv.Itoa(rule.Fee))
 	args = append(args, rule.ToWallet)
 	args = append(args, rule.ToExternal)
 	args = append(args, rule.Date)
-	args = append(args, rule.Quantity)
-	args = append(args, rule.State)
+	args = append(args, strconv.Itoa(rule.Quantity))
+	args = append(args, strconv.FormatBool(rule.State))
 
 	eventID := "saveRule"
 
