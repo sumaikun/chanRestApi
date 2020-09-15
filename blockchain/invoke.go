@@ -271,48 +271,6 @@ func (setup *FabricSetup) SaveEvent(event Models.Event) (string, error) {
 
 }
 
-// SaveEvent driver
-func (setup *FabricSetup) SaveEvent(event Models.Event) (string, error) {
-	// Prepare arguments
-	var args []string
-	args = append(args, "saveEvent")
-	args = append(args, event.FromExternal)
-	args = append(args, event.FromWallet)
-	args = append(args, event.ToWallet)
-	args = append(args, event.ToExternal)
-
-	eventID := "saveEvent"
-
-	// Add data that will be visible in the proposal, like a description of the invoke request
-	transientDataMap := make(map[string][]byte)
-	//transientDataMap["result"] = []byte("Transient data in save participant")
-
-	reg, notifier, err := setup.event.RegisterChaincodeEvent(setup.ChainCodeID2, eventID)
-	if err != nil {
-		return "", err
-	}
-	defer setup.event.Unregister(reg)
-
-	// Create a request (proposal) and send it
-	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3]), []byte(args[4])}, TransientMap: transientDataMap})
-	if err != nil {
-		fmt.Errorf("failed to save external agent: %v", err)
-		return "", err
-	}
-
-	// Wait for the result of the submission
-	select {
-	case ccEvent := <-notifier:
-		fmt.Printf("Received CC event: %s\n", ccEvent)
-	case <-time.After(time.Second * 20):
-		fmt.Errorf("did NOT receive CC event for eventId(%s)", eventID)
-		return "", errors.New("did NOT receive CC event for eventId")
-	}
-
-	return string(response.TransactionID), nil
-
-}
-
 // SaveRule driver
 func (setup *FabricSetup) SaveRule(rule Models.Rule) (string, error) {
 	// Prepare arguments
