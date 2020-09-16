@@ -190,8 +190,8 @@ func main() {
 	router.Handle("/walletRules", middleware.AuthMiddleware(http.HandlerFunc(app.getRules))).Methods("GET")
 
 	/* Wallet Payments */
-	router.Handle("/externalPayment", middleware.AuthMiddleware(http.HandlerFunc(app.externalPayment)).Methods("POST")
-	router.Handle("/walletPayment", middleware.AuthMiddleware(http.HandlerFunc(app.walletPayment)).Methods("POST")
+	router.Handle("/externalPayment", middleware.AuthMiddleware(http.HandlerFunc(app.externalPayment))).Methods("POST")
+	router.Handle("/walletPayment", middleware.AuthMiddleware(http.HandlerFunc(app.walletPayment))).Methods("POST")
 
 	/* ISSUES */
 	//router.HandleFunc("/issues", authentication).Methods("GET")
