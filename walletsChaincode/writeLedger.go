@@ -264,8 +264,8 @@ func (t *ApesWallet) saveRule(stub shim.ChaincodeStubInterface, args []string) p
 	// 0,        1,     2,       3,       4,    5,       6
 	// event, fee, toWallet, toExternal, date, quantity, state
 
-	if len(args) != 6 {
-		return shim.Error("Incorrect number of arguments. Expecting 5")
+	if len(args) != 7 {
+		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
 	if len(args[2]) > 0 && len(args[3]) > 0 {
