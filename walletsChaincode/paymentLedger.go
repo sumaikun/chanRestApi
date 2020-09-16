@@ -79,7 +79,7 @@ func (t *ApesWallet) makeExternalPayment(stub shim.ChaincodeStubInterface, args 
 		return shim.Error("quantity argument must be a numeric string")
 	}
 
-	paymentType := strings.ToLower(args[4])
+	paymentType := strings(args[4])
 
 	identification := strings.ToLower(args[5])
 
