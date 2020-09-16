@@ -276,7 +276,7 @@ func (t *ApesWallet) saveRule(stub shim.ChaincodeStubInterface, args []string) p
 		return shim.Error("must give  an external argent or a wallet for an output rule")
 	}
 
-	if len(args[1]) > 0 && len(args[5]) > 0 {
+	if len(args[1]) > 1 && len(args[5]) > 1 {
 		return shim.Error("its only valid  a fee or a quantity for output rule")
 	}
 
