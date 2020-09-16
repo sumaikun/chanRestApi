@@ -894,13 +894,13 @@ func (app *Application) externalPayment(w http.ResponseWriter, r *http.Request) 
 	externalPayment.Identification = RandStringRunes(12)
 
 	// Invoke the chaincode
-	txID, err2 := app.Fabric.ExternalPayment(rule)
+	txID, err2 := app.Fabric.ExternalPayment(externalPayment)
 	if err2 != nil {
-		fmt.Printf("Unable to save rule on the chaincode: %v\n", err2)
+		fmt.Printf("Unable to save externalPayment on the chaincode: %v\n", err2)
 		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
 		return
 	}
-	fmt.Printf("Successfully save rule transaction ID: %s\n", txID)
+	fmt.Printf("Successfully save externalPayment transaction ID: %s\n", txID)
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
 
 }
@@ -921,13 +921,13 @@ func (app *Application) walletPayment(w http.ResponseWriter, r *http.Request) {
 	walletPayment.Identification = RandStringRunes(12)
 
 	// Invoke the chaincode
-	txID, err2 := app.Fabric.WalletPayment(rule)
+	txID, err2 := app.Fabric.WalletPayment(walletPayment)
 	if err2 != nil {
-		fmt.Printf("Unable to save rule on the chaincode: %v\n", err2)
+		fmt.Printf("Unable to save walletPayment on the chaincode: %v\n", err2)
 		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
 		return
 	}
-	fmt.Printf("Successfully save rule transaction ID: %s\n", txID)
+	fmt.Printf("Successfully save walletPayment transaction ID: %s\n", txID)
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
 
 }
