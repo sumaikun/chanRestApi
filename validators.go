@@ -158,7 +158,9 @@ func eventValidator(r *http.Request) (map[string]interface{}, Models.Event) {
 
 	var event Models.Event
 
-	rules := govalidator.MapData{}
+	rules := govalidator.MapData{
+		"fromExternal": []string{"ifExist"},
+	}
 
 	opts := govalidator.Options{
 		Request:         r,

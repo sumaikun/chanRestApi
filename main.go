@@ -12,6 +12,7 @@ import (
 	Config "github.com/sumaikun/apeslogistic-rest-api/config"
 	Dao "github.com/sumaikun/apeslogistic-rest-api/dao"
 	middleware "github.com/sumaikun/apeslogistic-rest-api/middlewares"
+	"github.com/thedevsaddam/govalidator"
 )
 
 //Application object to chaincode connection
@@ -58,6 +59,16 @@ func init() {
 	dao.Server = config.Server
 	dao.Database = config.Database
 	dao.Connect()
+
+	govalidator.AddCustomRule("ifExist", func(field string, rule string, message string, value interface{}) error {
+
+		if len(value.(string)) >= 0 {
+			return nil
+		}
+
+		return fmt.Errorf("The %s field must exist", field)
+
+	})
 
 }
 
