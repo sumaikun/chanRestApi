@@ -14,10 +14,10 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 	fmt.Println("########### ApesWallet create Owner ###########")
 	var err error
 
-	// 0 ,    1,           2,       3,     4,             5,        6
-	// name,  nationality, address, phone, identification, photoUrl, notes,
+	// 0 ,    1,           2,       3,     4,             5,        6		7
+	// name,  nationality, address, phone, email, identification, photoUrl, notes,
 
-	if len(args) != 7 {
+	if len(args) != 8 {
 		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
@@ -38,6 +38,10 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 	}
 
 	if len(args[4]) <= 0 {
+		return shim.Error("email argument must be a non-empty string")
+	}
+
+	if len(args[5]) <= 0 {
 		return shim.Error("identification argument must be a non-empty string")
 	}
 
@@ -45,7 +49,9 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 
 	address := strings.ToLower(args[2])
 
-	identification := strings.ToLower(args[4])
+	identification := strings.ToLower(args[5])
+
+	email := strings.ToLower(args[4])
 
 	nationality := strings.ToLower(args[1])
 
@@ -67,7 +73,7 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 		//return shim.Error("This owner already exists: " + identification)
 	}
 
-	owner := &Owner{objectType, name, nationality, address, phone, identification, photoURL, notes, balance}
+	owner := &Owner{objectType, name, nationality, address, phone, email, identification, photoURL, notes, balance}
 	ownerJSONasBytes, err := json.Marshal(owner)
 	if err != nil {
 		return shim.Error(err.Error())

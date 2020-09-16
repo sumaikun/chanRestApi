@@ -153,6 +153,7 @@ func (setup *FabricSetup) SaveOwner(owner Models.Owner) (string, error) {
 	args = append(args, owner.Nationality)
 	args = append(args, owner.Address)
 	args = append(args, owner.Phone)
+	args = append(args, owner.Email)
 	args = append(args, owner.Identification)
 	args = append(args, owner.PhotoURL)
 	args = append(args, owner.Notes)
@@ -170,7 +171,7 @@ func (setup *FabricSetup) SaveOwner(owner Models.Owner) (string, error) {
 	defer setup.event.Unregister(reg)
 
 	// Create a request (proposal) and send it
-	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID2, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3]), []byte(args[4]), []byte(args[5]), []byte(args[6]), []byte(args[7])}, TransientMap: transientDataMap})
+	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID2, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3]), []byte(args[4]), []byte(args[5]), []byte(args[6]), []byte(args[7], []byte(args[8])}, TransientMap: transientDataMap})
 	if err != nil {
 		fmt.Errorf("failed to save owner: %v", err)
 		return "", err
