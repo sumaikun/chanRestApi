@@ -201,3 +201,56 @@ func rulesValidator(r *http.Request) (map[string]interface{}, Models.Rule) {
 
 	return err, rule
 }
+
+func externalPaymentValidator(r *http.Request) (map[string]interface{}, Models.ExternalPayment) {
+
+	var externalPayment Models.ExternalPayment
+
+	rules := govalidator.MapData{
+		"fromExternal": []string{"required"},
+		"toWallet":     []string{"required"},
+		"quantity":     []string{"required"},
+		"paymentType":  []string{"required"},
+	}
+
+	opts := govalidator.Options{
+		Request:         r,
+		Data:            &externalPayment,
+		Rules:           rules,
+		RequiredDefault: true,
+	}
+
+	v := govalidator.New(opts)
+	e := v.ValidateJSON()
+	//fmt.Println(user)
+
+	err := map[string]interface{}{"validationError": e}
+
+	return err, externalPayment
+}
+
+func walletPaymentValidator(r *http.Request) (map[string]interface{}, Models.WalletPayment) {
+
+	var walletPayment Models.WalletPayment
+
+	rules := govalidator.MapData{
+		"fromWallet": []string{"required"},
+		"toWallet":   []string{"required"},
+		"quantity":   []string{"required"},
+	}
+
+	opts := govalidator.Options{
+		Request:         r,
+		Data:            &walletPayment,
+		Rules:           rules,
+		RequiredDefault: true,
+	}
+
+	v := govalidator.New(opts)
+	e := v.ValidateJSON()
+	//fmt.Println(user)
+
+	err := map[string]interface{}{"validationError": e}
+
+	return err, walletPayment
+}

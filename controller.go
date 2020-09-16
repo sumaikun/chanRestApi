@@ -877,3 +877,57 @@ func (app *Application) getRules(w http.ResponseWriter, r *http.Request) {
 	Helpers.RespondWithJSON(w, http.StatusOK, raw)
 
 }
+
+func (app *Application) externalPayment(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, externalPayment := externalPaymentValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	externalPayment.Date = time.Now().String()
+
+	externalPayment.Identification = RandStringRunes(12)
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.ExternalPayment(rule)
+	if err2 != nil {
+		fmt.Printf("Unable to save rule on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save rule transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) walletPayment(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, walletPayment := walletPaymentValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	walletPayment.Date = time.Now().String()
+
+	walletPayment.Identification = RandStringRunes(12)
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.WalletPayment(rule)
+	if err2 != nil {
+		fmt.Printf("Unable to save rule on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save rule transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 
@@ -26,6 +27,8 @@ var (
 )
 
 var dao = Dao.MongoConnector{}
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 var fSetup = blockchain.FabricSetup{
 	// Network parameters
@@ -186,6 +189,10 @@ func main() {
 	router.Handle("/walletRules", middleware.AuthMiddleware(http.HandlerFunc(app.saveRule))).Methods("POST")
 	router.Handle("/walletRules", middleware.AuthMiddleware(http.HandlerFunc(app.getRules))).Methods("GET")
 
+	/* Wallet Payments */
+	router.Handle("/externalPayment", middleware.AuthMiddleware(http.HandlerFunc(app.externalPayment)).Methods("POST")
+	router.Handle("/walletPayment", middleware.AuthMiddleware(http.HandlerFunc(app.walletPayment)).Methods("POST")
+
 	/* ISSUES */
 	//router.HandleFunc("/issues", authentication).Methods("GET")
 
@@ -195,4 +202,12 @@ func main() {
 	//start server
 	log.Fatal(http.ListenAndServe(":"+port, &CORSRouterDecorator{router}))
 
+}
+
+func RandStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }
