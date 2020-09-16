@@ -184,6 +184,10 @@ func (t *ApesWallet) makeExternalPayment(stub shim.ChaincodeStubInterface, args 
 			value = []byte{0x00}
 			stub.PutState(typeIndexKey, value)
 
+			if err != nil {
+				return shim.Error(err.Error())
+			}
+
 			return shim.Error("not enought fonds  for this external payment")
 		}
 
@@ -238,7 +242,13 @@ func (t *ApesWallet) makeExternalPayment(stub shim.ChaincodeStubInterface, args 
 		value = []byte{0x00}
 		stub.PutState(typeIndexKey, value)
 
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
 	}
+
+	err = stub.SetEvent("makeExternalPayment", []byte(identification))
 
 	return shim.Success(nil)
 
@@ -408,6 +418,12 @@ func (t *ApesWallet) makeWalletPayment(stub shim.ChaincodeStubInterface, args []
 	}
 	value = []byte{0x00}
 	stub.PutState(typeIndexKey, value)
+
+	err = stub.SetEvent("makeWalletPayment", []byte(identification))
+
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 
 	return shim.Success(nil)
 
