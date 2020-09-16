@@ -64,7 +64,7 @@ func (setup *FabricSetup) WalletPayment(walletPayment Models.WalletPayment) (str
 	args = append(args, walletPayment.ToWallet)
 	args = append(args, walletPayment.Date)
 	args = append(args, strconv.Itoa(walletPayment.Quantity))
-	args = append(args, externalPayment.Identification)
+	args = append(args, walletPayment.Identification)
 
 	eventID := "makeWalletPayment"
 
