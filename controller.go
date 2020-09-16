@@ -843,6 +843,8 @@ func (app *Application) saveRule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	rule.Date = time.Now().String()
+
 	// Invoke the chaincode
 	txID, err2 := app.Fabric.SaveRule(rule)
 	if err2 != nil {
