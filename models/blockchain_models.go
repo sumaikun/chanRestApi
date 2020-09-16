@@ -33,6 +33,7 @@ type Owner struct {
 	Nationality    string `json:"nationality"`
 	Address        string `json:"address"`
 	Phone          string `json:"phone"`
+	Email          string `json:"email"`
 	Identification string `json:"identification"`
 	PhotoURL       string `json:"photoUrl"`
 	Notes          string `json:"notes"`
@@ -50,8 +51,8 @@ type ExternalAgent struct {
 // WalletPayment representation in chaincode
 type WalletPayment struct {
 	ObjectType     string `json:"docType"`
-	FromWallet     string `json:"from"`
-	ToWallet       string `json:"to"`
+	FromWallet     string `json:"fromWallet"`
+	ToWallet       string `json:"toWallet"`
 	State          string `json:"state"`
 	Date           string `json:"date"`
 	Quantity       int    `json:"quantity"`
@@ -61,8 +62,8 @@ type WalletPayment struct {
 // ExternalPayment representation in chaincode
 type ExternalPayment struct {
 	ObjectType     string `json:"docType"`
-	FromExternal   string `json:"from"`
-	ToWallet       string `json:"to"`
+	FromExternal   string `json:"fromExternal"`
+	ToWallet       string `json:"toWallet"`
 	State          string `json:"state"`
 	Date           string `json:"date"`
 	Quantity       int    `json:"quantity"`
@@ -72,21 +73,10 @@ type ExternalPayment struct {
 
 // Event representation in chaincode
 type Event struct {
-	ObjectType   string `json:"docType"`
-	FromExternal string `json:"fromExternal"`
-	FromWallet   string `json:"fromWallet"`
-	ToWallet     string `json:"toWallet"`
-	ToExternal   string `json:"toExternal"`
-}
-
-// Rule representation in chaincode
-type Rule struct {
-	ObjectType string `json:"docType"`
-	Event      string `json:"event"`
-	Fee        int    `json:"fee"`
-	ToWallet   string `json:"toWallet"`
-	ToExternal string `json:"toExternal"`
-	Date       string `json:"date"`
-	Quantity   int    `json:"quantity"`
-	State      bool   `json:"state"`
+	ObjectType     string `json:"docType"`
+	FromExternal   string `json:"fromExternal"`
+	FromWallet     string `json:"fromWallet"`
+	ToWallet       string `json:"toWallet"`
+	ToExternal     string `json:"toExternal"`
+	Identification string `json:"identification"`
 }

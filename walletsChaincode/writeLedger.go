@@ -225,7 +225,7 @@ func (t *ApesWallet) saveEvent(stub shim.ChaincodeStubInterface, args []string) 
 		//return shim.Error("This externalAgent already exists: " + identification)
 	}
 
-	event := &Event{objectType, fromExternal, fromWallet, toWallet, toExternal}
+	event := &Event{objectType, fromExternal, fromWallet, toWallet, toExternal, keyEvent}
 	eventJSONasBytes, err := json.Marshal(event)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -336,7 +336,7 @@ func (t *ApesWallet) saveRule(stub shim.ChaincodeStubInterface, args []string) p
 		//return shim.Error("This externalAgent already exists: " + identification)
 	}
 
-	rule := &Rule{objectType, event, fee, toWallet, toExternal, date, quantity, state}
+	rule := &Rule{objectType, event, fee, toWallet, toExternal, date, quantity, state, keyRule}
 
 	ruleJSONasBytes, err := json.Marshal(rule)
 	if err != nil {
