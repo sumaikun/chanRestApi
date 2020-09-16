@@ -279,11 +279,23 @@ func (setup *FabricSetup) SaveRule(rule Models.Rule) (string, error) {
 	var args []string
 	args = append(args, "saveRule")
 	args = append(args, rule.Event)
-	args = append(args, strconv.Itoa(rule.Fee))
+
+	if strconv.Itoa(rule.Fee) == 0 {
+		args = append(args, "")
+	} else {
+		args = append(args, strconv.Itoa(rule.Fee))
+	}
+
 	args = append(args, rule.ToWallet)
 	args = append(args, rule.ToExternal)
 	args = append(args, rule.Date)
-	args = append(args, strconv.Itoa(rule.Quantity))
+
+	if strconv.Itoa(rule.Quantity) == 0 {
+		args = append(args, "")
+	} else {
+		args = append(args, strconv.Itoa(rule.Quantity))
+	}
+
 	args = append(args, strconv.FormatBool(rule.State))
 
 	eventID := "saveRule"
