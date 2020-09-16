@@ -49,7 +49,7 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 
 	address := strings.ToLower(args[2])
 
-	identification := strings(args[5])
+	identification := string(args[5])
 
 	email := strings.ToLower(args[4])
 
@@ -129,7 +129,7 @@ func (t *ApesWallet) saveExternalAgent(stub shim.ChaincodeStubInterface, args []
 
 	description := strings.ToLower(args[1])
 
-	identification := strings(args[2])
+	identification := string(args[2])
 
 	objectType := "externalAgent"
 
