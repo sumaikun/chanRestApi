@@ -464,7 +464,7 @@ func (t *ApesWallet) makeWalletPayment(stub shim.ChaincodeStubInterface, args []
 
 }
 
-func (t *ApesWallet) checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, processQuantity int, walletID string) (int, error) {
+func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, processQuantity int, walletID string) (int, error) {
 	fmt.Println("########### ApesWallet eventsAndRules execution ###########")
 
 	deferError = nil
