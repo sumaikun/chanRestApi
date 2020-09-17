@@ -396,7 +396,7 @@ func (t *ApesWallet) makeWalletPayment(stub shim.ChaincodeStubInterface, args []
 			return shim.Error(err.Error())
 		}
 		updateFromOwner.Balance = updateFromOwner.Balance - quantity
-		updateOwner.Balance = updateToOwner.Balance + remainQuantity
+		updateToOwner.Balance = updateToOwner.Balance + remainQuantity
 	}
 
 	walletPayment := &WalletPayment{"walletPayment", fromWallet, toWallet, "failed", date, quantity, identification}
@@ -474,7 +474,7 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 	rulesQuantity := processQuantity
 
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	defer resultsIterator.Close()
@@ -485,13 +485,13 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 
 		responseRange, err := resultsIterator.Next()
 		if err != nil {
-			return nil, err
+			return 0, err
 		}
 
 		_, compositeKeyParts, err := stub.SplitCompositeKey(responseRange.Key)
 
 		if err != nil {
-			return nil, err
+			return 0, err
 		}
 
 		returnedID := compositeKeyParts[1]
@@ -499,9 +499,9 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 		valAsbytes, err := stub.GetState(returnedID)
 
 		if err != nil {
-			return nil, err
+			return 0, err
 		} else if valAsbytes == nil {
-			return nil, errors.New("Rule not exist but registered on composite keys")
+			return 0, errors.New("Rule not exist but registered on composite keys")
 		}
 
 		rule := Rule{}
@@ -513,14 +513,14 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 			if quantityToreduce > processQuantity {
 				deferError = errors.New("Not  enought fonds for this rule " + rule.Identification)
 
-				return nil, errors.New("Not  enought fonds for this rule " + rule.Identification)
+				return 0, errors.New("Not  enought fonds for this rule " + rule.Identification)
 			}
 
 		} else {
 			if rule.Quantity > processQuantity {
 				deferError = errors.New("Not  enought fonds for this rule " + rule.Identification)
 
-				return nil, errors.New("Not  enought fonds for this rule " + rule.Identification)
+				return 0, errors.New("Not  enought fonds for this rule " + rule.Identification)
 			}
 			quantityToreduce := rulesQuantity - rule.Quantity
 		}
@@ -533,7 +533,7 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 
 			externalPaymentJSONasBytes, err := json.Marshal(externalPayment)
 			if err != nil {
-				return nil, err
+				return 0, err
 			}
 
 			//deferError
@@ -544,12 +544,12 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 
 					err = stub.PutState(identification, externalPaymentJSONasBytes)
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 					indexName := "type~identification"
 					typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{"externalPayment", identification})
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 					value := []byte{0x00}
 					stub.PutState(typeIndexKey, value)
@@ -557,7 +557,7 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 					indexName = "wallet~externalPayment"
 					typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{walletID, identification})
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 					value = []byte{0x00}
 					stub.PutState(typeIndexKey, value)
@@ -565,7 +565,7 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 					indexName = "externalAgent~externalPayment"
 					typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{rule.ToExternal, identification})
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 					value = []byte{0x00}
 					stub.PutState(typeIndexKey, value)
@@ -586,9 +586,9 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 
 					toWalletAsBytes, err := stub.GetState(rule.toWallet)
 					if err != nil {
-						return nil, err
+						return 0, err
 					} else if toWalletAsBytes == nil {
-						return nil, errors.New("Rule not exist but registered on composite keys")
+						return 0, errors.New("Rule not exist but registered on composite keys")
 					}
 
 					updateToOwner := Owner{}
@@ -598,30 +598,30 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 
 					walletPaymentJSONasBytes, err := json.Marshal(walletPayment)
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 
 					err = stub.PutState(identification, walletPaymentJSONasBytes)
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 
 					updateToOwner.Balance = updateToOwner.Balance + quantityToreduce
 
 					updateToOwnerJSONasBytes, err := json.Marshal(updateToOwner)
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 
 					err = stub.PutState(updateToOwner.Identification, updateToOwnerJSONasBytes)
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 
 					indexName := "type~identification"
 					typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{"walletPayment", identification})
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 					value := []byte{0x00}
 					defer stub.PutState(typeIndexKey, value)
@@ -629,7 +629,7 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 					indexName = "fromWallet~walletPayment"
 					typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{walletID, identification})
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 					value = []byte{0x00}
 					stub.PutState(typeIndexKey, value)
@@ -637,7 +637,7 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 					indexName = "toWallet~walletPayment"
 					typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{updateToOwner.Identification, identification})
 					if err != nil {
-						return nil, err
+						return 0, err
 					}
 					value = []byte{0x00}
 					stub.PutState(typeIndexKey, value)
