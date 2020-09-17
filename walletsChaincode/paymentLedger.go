@@ -1,11 +1,10 @@
 package main
 
 import (
-	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math"
+	"math/rand"
 	"strconv"
 	"strings"
 	"time"
@@ -15,6 +14,9 @@ import (
 )
 
 var deferError error
+
+var seededRand *rand.Rand = rand.New(
+	rand.NewSource(time.Now().UnixNano()))
 
 func (t *ApesWallet) makeExternalPayment(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	fmt.Println("########### ApesWallet makeExternalPayment ###########")
@@ -507,8 +509,10 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 		rule := Rule{}
 		_ = json.Unmarshal(valAsbytes, &rule)
 
+		var quantityToreduce int
+
 		if rule.Fee > 0 {
-			quantityToreduce := rulesQuantity * (rule.Fee / 100)
+			quantityToreduce = rulesQuantity * (rule.Fee / 100)
 
 			if quantityToreduce > processQuantity {
 				deferError = errors.New("Not  enought fonds for this rule " + rule.Identification)
@@ -522,10 +526,12 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 
 				return 0, errors.New("Not  enought fonds for this rule " + rule.Identification)
 			}
-			quantityToreduce := rulesQuantity - rule.Quantity
+			quantityToreduce = rule.Quantity
 		}
 
-		if len(rule.ToExternal > 0) {
+		fmt.Println("quantityToreduce: " + quantityToreduce)
+
+		if len(rule.ToExternal) > 0 {
 
 			identification := string(rand.Int())
 
@@ -538,7 +544,7 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 
 			//deferError
 
-			defer1 := func(stub shim.ChaincodeStubInterface, identification string, externalPaymentJSONasBytes []byte, rule Rule, walletID string) {
+			defer1 := func(stub shim.ChaincodeStubInterface, identification string, externalPaymentJSONasBytes []byte, rule Rule, walletID string) (int, error) {
 
 				if deferError == nil {
 
@@ -571,20 +577,22 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 					stub.PutState(typeIndexKey, value)
 				}
 
+				return 0, nil
+
 			}
 			defer defer1(stub, identification, externalPaymentJSONasBytes, rule, walletID)
 
 		}
 
-		if len(rule.ToWallet > 0) {
+		if len(rule.ToWallet) > 0 {
 
 			identification := string(rand.Int())
 
-			defer2 := func(stub shim.ChaincodeStubInterface, rule Rule, identification string, quantityToreduce int, walletID string) {
+			defer2 := func(stub shim.ChaincodeStubInterface, rule Rule, identification string, quantityToreduce int, walletID string) (int, error) {
 
 				if deferError == nil {
 
-					toWalletAsBytes, err := stub.GetState(rule.toWallet)
+					toWalletAsBytes, err := stub.GetState(rule.ToWallet)
 					if err != nil {
 						return 0, err
 					} else if toWalletAsBytes == nil {
@@ -642,13 +650,15 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 					value = []byte{0x00}
 					stub.PutState(typeIndexKey, value)
 				}
+
+				return 0, nil
 			}
 
 			go defer2(stub, rule, identification, quantityToreduce, walletID)
 
 		}
 
-		processQuantity = processQuantity - math.RoundToEven(quantityToreduce)
+		processQuantity = processQuantity - quantityToreduce
 
 	}
 
