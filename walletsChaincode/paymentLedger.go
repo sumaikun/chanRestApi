@@ -512,7 +512,14 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 		var quantityToreduce int
 
 		if rule.Fee > 0 {
-			quantityToreduce = rulesQuantity * (rule.Fee / 100)
+
+			percent := (rule.Fee / 100)
+
+			fmt.Println("percent: " + string(percent))
+
+			quantityToreduce = rulesQuantity * percent
+
+			fmt.Println("quantityToreduce prev: " + string(quantityToreduce))
 
 			if quantityToreduce > processQuantity {
 				deferError = errors.New("Not  enought fonds for this rule " + rule.Identification)
@@ -529,7 +536,7 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 			quantityToreduce = rule.Quantity
 		}
 
-		fmt.Println("quantityToreduce: " + quantityToreduce)
+		fmt.Println("quantityToreduce: " + string(quantityToreduce))
 
 		if len(rule.ToExternal) > 0 {
 
