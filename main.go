@@ -193,6 +193,12 @@ func main() {
 	router.Handle("/externalPayment", middleware.AuthMiddleware(http.HandlerFunc(app.externalPayment))).Methods("POST")
 	router.Handle("/walletPayment", middleware.AuthMiddleware(http.HandlerFunc(app.walletPayment))).Methods("POST")
 
+	/* Trazability */
+	router.Handle("/walletExternalPayment/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.walletExternalPayment))).Methods("GET")
+	router.Handle("/externalAgentExternalPayment/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.walletExternalPayment))).Methods("GET")
+	router.Handle("/fromWalletWalletPayment/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.fromWalletWalletPayment))).Methods("GET")
+	router.Handle("/toWalletWalletPayment/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.toWalletWalletPayment))).Methods("GET")
+
 	/* ISSUES */
 	//router.HandleFunc("/issues", authentication).Methods("GET")
 

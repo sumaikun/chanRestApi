@@ -931,3 +931,111 @@ func (app *Application) walletPayment(w http.ResponseWriter, r *http.Request) {
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
 
 }
+
+func (app *Application) walletExternalPayment(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+	}
+
+	response, err := app.Fabric.QueryByType2("wallet~externalPayment", params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) externalAgentExternalPayment(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+	}
+
+	response, err := app.Fabric.QueryByType2("externalAgent~externalPayment", params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) fromWalletWalletPayment(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+	}
+
+	response, err := app.Fabric.QueryByType2("fromWallet~walletPayment", params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) toWalletWalletPayment(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+	}
+
+	response, err := app.Fabric.QueryByType2("toWallet~walletPayment", params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}

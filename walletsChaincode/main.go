@@ -131,6 +131,11 @@ func (t *ApesWallet) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.getObjectTypeWithKey(stub, args)
 	}
 
+	// getObjectTypeByKey
+	if function == "getObjectTypeByKey" {
+		return t.getObjectTypeByKey(stub, args)
+	}
+
 	// saveOwner
 	if function == "saveOwner" {
 		return t.saveOwner(stub, args)

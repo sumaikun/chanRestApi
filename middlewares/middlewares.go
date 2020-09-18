@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -14,6 +15,10 @@ import (
 	Dao "github.com/sumaikun/apeslogistic-rest-api/dao"
 
 	"github.com/gorilla/context"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 )
 
 var dao = Dao.MongoConnector{}
@@ -21,23 +26,48 @@ var dao = Dao.MongoConnector{}
 // AuthMiddleware verify
 func AuthMiddleware(next http.Handler) http.Handler {
 
-	var config = C.Config{}
-	config.Read()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {		
 
-	var JwtKey = []byte(config.Jwtkey)
+		at := r.Header.Get("Authorization")
 
-	if len(JwtKey) == 0 {
-		log.Fatal("HTTP server unable to start, expected an APP_KEY for JWT auth")
-	}
-	jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
-		Extractor: jwtmiddleware.FromFirst(jwtmiddleware.FromAuthHeader,
-			jwtmiddleware.FromParameter("token")),
-		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-			return []byte(JwtKey), nil
-		},
-		SigningMethod: jwt.SigningMethodHS256,
-	})
-	return jwtMiddleware.Handler(next)
+		ifContains := strings.Contains(at, "Bearer ")
+
+		if ifContains == true {
+
+			cognitoClient := cognito.GetUserInput{ AccessToken: at }
+
+			err := cognitoClient.Validate()
+
+			if err != nil {
+				fmt.Printf(err)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+			return
+
+		}
+
+	
+		var config = C.Config{}
+		config.Read()
+
+		var JwtKey = []byte(config.Jwtkey)
+
+		if len(JwtKey) == 0 {
+			log.Fatal("HTTP server unable to start, expected an APP_KEY for JWT auth")
+		}
+		jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
+			Extractor: jwtmiddleware.FromFirst(jwtmiddleware.FromAuthHeader,
+				jwtmiddleware.FromParameter("token")),
+			ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+				return []byte(JwtKey), nil
+			},
+			SigningMethod: jwt.SigningMethodHS256,
+		})
+		return jwtMiddleware.Handler(next)
+
+	}	
 
 }
 
