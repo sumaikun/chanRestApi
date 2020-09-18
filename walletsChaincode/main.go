@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 // ApesWallet implementation of Chaincode
 type ApesWallet struct {
@@ -186,4 +189,13 @@ func Contains(a []string, x string) bool {
 		}
 	}
 	return false
+}
+
+// RandStringRunes for generate random string
+func RandStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }

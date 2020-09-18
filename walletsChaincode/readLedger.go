@@ -108,11 +108,11 @@ func (t *ApesWallet) getObjectTypeByKey(stub shim.ChaincodeStubInterface, args [
 		return shim.Error("Incorrect number of arguments. Expecting key and objectType to query")
 	}
 
-	key := args[1]
+	key := args[0]
 
 	docType := args[1]
 
-	resultsIterator, err := stub.GetStateByPartialCompositeKey("type~identification", []string{docType})
+	resultsIterator, err := stub.GetStateByPartialCompositeKey(key, []string{docType})
 
 	if err != nil {
 		return shim.Error(err.Error())

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -15,10 +14,6 @@ import (
 	Dao "github.com/sumaikun/apeslogistic-rest-api/dao"
 
 	"github.com/gorilla/context"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 )
 
 var dao = Dao.MongoConnector{}
@@ -26,7 +21,7 @@ var dao = Dao.MongoConnector{}
 // AuthMiddleware verify
 func AuthMiddleware(next http.Handler) http.Handler {
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {		
+	cognitoChecking := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		at := r.Header.Get("Authorization")
 
@@ -40,15 +35,18 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 			if err != nil {
 				fmt.Printf(err)
-				return
+				return false
 			}
 
-			next.ServeHTTP(w, r)
-			return
+			//next.ServeHTTP(w, r)
+			return true
 
 		}
 
-	
+		return false
+	}
+
+	if cognitoChecking == false {
 		var config = C.Config{}
 		config.Read()
 
@@ -66,8 +64,10 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			SigningMethod: jwt.SigningMethodHS256,
 		})
 		return jwtMiddleware.Handler(next)
+	}
 
-	}	
+	return next.ServeHTTP(w, r)
+	
 
 }
 

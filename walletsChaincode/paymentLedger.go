@@ -546,9 +546,9 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 
 		if len(rule.ToExternal) > 0 {
 
-			identification := string(rand.Int())
+			identification := RandStringRunes(12)
 
-			externalPayment := ExternalPayment{"externalPayment", rule.ToExternal, walletID, "ruleExecution", time.Now().String(), quantityToreduce, "PAY", identification}
+			externalPayment := ExternalPayment{"externalPayment", rule.ToExternal, walletID, "ruleExecution", time.Now().String(), quantityToreduce, "DISCOUNT", identification}
 
 			externalPaymentJSONasBytes, err := json.Marshal(externalPayment)
 			if err != nil {
@@ -599,7 +599,7 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 
 		if len(rule.ToWallet) > 0 {
 
-			identification := string(rand.Int())
+			identification := RandStringRunes(12)
 
 			defer2 := func(stub shim.ChaincodeStubInterface, rule Rule, identification string, quantityToreduce int, walletID string) (int, error) {
 
