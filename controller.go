@@ -889,9 +889,15 @@ func (app *Application) externalPayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	cognito_email := context.Get(r, "cognito_email")
+	cognitoEmail := context.Get(r, "cognito_email")
 
-	fmt.Printf("cognito_email", cognito_email)
+	if cognitoEmail != nil {
+		cognitoEmailParsed := cognitoEmail.(*string)
+
+		fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+		externalPayment.ToWallet = *cognitoEmailParsed
+	}
 
 	externalPayment.Date = time.Now().String()
 
@@ -918,6 +924,16 @@ func (app *Application) walletPayment(w http.ResponseWriter, r *http.Request) {
 		//fmt.Println(len(e))
 		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
 		return
+	}
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail != nil {
+		cognitoEmailParsed := cognitoEmail.(*string)
+
+		fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+		walletPayment.FromWallet = *cognitoEmailParsed
 	}
 
 	walletPayment.Date = time.Now().String()

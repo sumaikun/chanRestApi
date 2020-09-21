@@ -214,6 +214,7 @@ func main() {
 
 }
 
+//RandStringRunes method
 func RandStringRunes(n int) string {
 	b := make([]rune, n)
 	for i := range b {
