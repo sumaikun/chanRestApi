@@ -197,11 +197,17 @@ func main() {
 	router.Handle("/externalPayment", middleware.CognitoMiddleware(middleware.AuthMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.externalPayment))))).Methods("POST")
 	router.Handle("/walletPayment", middleware.CognitoMiddleware(middleware.AuthMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.walletPayment))))).Methods("POST")
 
-	/* Trazability */
-	router.Handle("/walletExternalPayment/{key}", middleware.CognitoMiddleware(middleware.AuthMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.walletExternalPayment))))).Methods("GET")
-	router.Handle("/externalAgentExternalPayment/{key}", middleware.CognitoMiddleware(middleware.AuthMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.walletExternalPayment))))).Methods("GET")
-	router.Handle("/fromWalletWalletPayment/{key}", middleware.CognitoMiddleware(middleware.AuthMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.fromWalletWalletPayment))))).Methods("GET")
-	router.Handle("/toWalletWalletPayment/{key}", middleware.CognitoMiddleware(middleware.AuthMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.toWalletWalletPayment))))).Methods("GET")
+	/* Trazability with admin */
+	router.Handle("/walletExternalPayment/{key}", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.walletExternalPayment))))).Methods("GET")
+	router.Handle("/externalAgentExternalPayment/{key}", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.walletExternalPayment))))).Methods("GET")
+	router.Handle("/fromWalletWalletPayment/{key}", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.fromWalletWalletPayment))))).Methods("GET")
+	router.Handle("/toWalletWalletPayment/{key}", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.toWalletWalletPayment))))).Methods("GET")
+
+	/* Trazability by token */
+	router.Handle("/walletExternalPayment", middleware.CognitoMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.walletExternalPaymentWithToken)))).Methods("GET")
+	router.Handle("/externalAgentExternalPayment", middleware.CognitoMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.walletExternalPaymentWithToken)))).Methods("GET")
+	router.Handle("/fromWalletWalletPayment", middleware.CognitoMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.fromWalletWalletPaymentWithToken)))).Methods("GET")
+	router.Handle("/toWalletWalletPayment", middleware.CognitoMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.toWalletWalletPaymentWithToken)))).Methods("GET")
 
 	/* ISSUES */
 	//router.HandleFunc("/issues", authentication).Methods("GET")

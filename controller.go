@@ -1059,3 +1059,127 @@ func (app *Application) toWalletWalletPayment(w http.ResponseWriter, r *http.Req
 	Helpers.RespondWithJSON(w, http.StatusOK, raw)
 
 }
+
+func (app *Application) walletExternalPaymentWithToken(w http.ResponseWriter, r *http.Request) {
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail == nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+	}
+
+	cognitoEmailParsed := cognitoEmail.(*string)
+
+	fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+	response, err := app.Fabric.QueryByType2("wallet~externalPayment", *cognitoEmailParsed)
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) externalAgentExternalPaymentWithToken(w http.ResponseWriter, r *http.Request) {
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail == nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+	}
+
+	cognitoEmailParsed := cognitoEmail.(*string)
+
+	fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+	response, err := app.Fabric.QueryByType2("externalAgent~externalPayment", *cognitoEmailParsed)
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) fromWalletWalletPaymentWithToken(w http.ResponseWriter, r *http.Request) {
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail == nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+	}
+
+	cognitoEmailParsed := cognitoEmail.(*string)
+
+	fmt.Println("cognitoEmailParsed", v)
+
+	response, err := app.Fabric.QueryByType2("fromWallet~walletPayment", *cognitoEmailParsed)
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) toWalletWalletPaymentWithToken(w http.ResponseWriter, r *http.Request) {
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail == nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+	}
+
+	cognitoEmailParsed := cognitoEmail.(*string)
+
+	fmt.Println("cognitoEmailParsed", v)
+
+	response, err := app.Fabric.QueryByType2("toWallet~walletPayment", *cognitoEmailParsed)
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
