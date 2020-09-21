@@ -265,7 +265,8 @@ func (app *Application) CreateWalletIfNotExist(next http.Handler) http.Handler {
 			return
 		}
 
-		Helpers.RespondWithJSON(w, http.StatusUnauthorized, map[string]string{"error": "wallet not exist"})
+		next.ServeHTTP(w, r)
+
 		return
 
 	})
