@@ -179,7 +179,7 @@ func main() {
 
 	/* External Agents */
 	router.Handle("/walletExternalAgents", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.saveExternalAgent))))).Methods("POST")
-	router.Handle("/walletExternalAgents", middleware.CognitoMiddleware(middleware.AuthMiddleware(http.HandlerFunc(app.getExternalAgents)))).Methods("GET")
+	router.Handle("/walletExternalAgents", middleware.CognitoMiddleware(middleware.AuthMiddleware(middleware.CreateWalletIfNotExist(http.HandlerFunc(app.getExternalAgents))))).Methods("GET")
 
 	/* Wallets Events */
 	router.Handle("/walletEvents", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.saveEvent))))).Methods("POST")

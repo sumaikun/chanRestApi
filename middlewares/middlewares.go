@@ -188,3 +188,33 @@ func OnlyAdminMiddleware(next http.Handler) http.Handler {
 	})
 
 }
+
+// CreateWalletIfNotExist Verify Wallet Existence
+func CreateWalletIfNotExist(next http.Handler) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		cognitoEmail := context.Get(r, "cognito_email")
+
+		if cognitoEmail != nil {
+			cognitoEmailParsed := cognitoEmail.(*string)
+
+			fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+			response, err := app.Fabric.QueryGetData2(*cognitoEmailParsed)
+			if err != nil {
+				fmt.Printf("Unable to query  the chaincode: %v\n", err)
+				Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+				return
+			}
+
+			fmt.Print("Response from chaincode: %s\n", response)
+
+			next.ServeHTTP(w, r)
+		}
+
+		Helpers.RespondWithJSON(w, http.StatusUnauthorized, map[string]string{"error": "wallet not exist"})
+		return
+
+	})
+}
