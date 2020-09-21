@@ -178,9 +178,10 @@ func OnlyAdminMiddleware(next http.Handler) http.Handler {
 
 		userParsed := user.(bson.M)
 
-		if userParsed["role"] == "admin" {
+		if userParsed["role"] == "ADMIN" {
 			next.ServeHTTP(w, r)
 		} else {
+			Helpers.RespondWithError(w, http.StatusUnauthorized, map[string]string{"error": "only admin can do this work"})
 			return
 		}
 

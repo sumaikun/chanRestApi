@@ -208,9 +208,9 @@ func externalPaymentValidator(r *http.Request) (map[string]interface{}, Models.E
 
 	rules := govalidator.MapData{
 		"fromExternal": []string{"required"},
-		"toWallet":     []string{"required"},
-		"quantity":     []string{"required"},
-		"paymentType":  []string{"required"},
+		//"toWallet":     []string{"required"},
+		"quantity":    []string{"required"},
+		"paymentType": []string{"required"},
 	}
 
 	opts := govalidator.Options{
@@ -234,9 +234,9 @@ func walletPaymentValidator(r *http.Request) (map[string]interface{}, Models.Wal
 	var walletPayment Models.WalletPayment
 
 	rules := govalidator.MapData{
-		"fromWallet": []string{"required"},
-		"toWallet":   []string{"required"},
-		"quantity":   []string{"required"},
+		//"fromWallet": []string{"required"},
+		"toWallet": []string{"required"},
+		"quantity": []string{"required"},
 	}
 
 	opts := govalidator.Options{

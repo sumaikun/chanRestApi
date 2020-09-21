@@ -174,19 +174,19 @@ func main() {
 	router.Handle("/getHistoryForKey2/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.getHistoryForKey2))).Methods("GET")
 
 	/* Owners */
-	router.Handle("/walletOwners", middleware.AuthMiddleware(http.HandlerFunc(app.saveOwner))).Methods("POST")
+	router.Handle("/walletOwners", middleware.AuthMiddleware(middleware.UserMiddleware(OnlyAdminMiddleware(http.HandlerFunc(app.saveOwner))))).Methods("POST")
 	router.Handle("/walletOwners", middleware.CognitoMiddleware(middleware.AuthMiddleware(http.HandlerFunc(app.getOwners)))).Methods("GET")
 
 	/* External Agents */
-	router.Handle("/walletExternalAgents", middleware.AuthMiddleware(http.HandlerFunc(app.saveExternalAgent))).Methods("POST")
+	router.Handle("/walletExternalAgents", middleware.AuthMiddleware(middleware.UserMiddleware(OnlyAdminMiddleware(http.HandlerFunc(app.saveExternalAgent))))).Methods("POST")
 	router.Handle("/walletExternalAgents", middleware.CognitoMiddleware(middleware.AuthMiddleware(http.HandlerFunc(app.getExternalAgents)))).Methods("GET")
 
 	/* Wallets Events */
-	router.Handle("/walletEvents", middleware.AuthMiddleware(http.HandlerFunc(app.saveEvent))).Methods("POST")
+	router.Handle("/walletEvents", middleware.AuthMiddleware(middleware.UserMiddleware(OnlyAdminMiddleware(http.HandlerFunc(app.saveEvent))))).Methods("POST")
 	router.Handle("/walletEvents", middleware.AuthMiddleware(http.HandlerFunc(app.getEvents))).Methods("GET")
 
 	/* Wallets Rules */
-	router.Handle("/walletRules", middleware.AuthMiddleware(http.HandlerFunc(app.saveRule))).Methods("POST")
+	router.Handle("/walletRules", middleware.AuthMiddleware(middleware.UserMiddleware(OnlyAdminMiddleware(http.HandlerFunc(app.saveRule))))).Methods("POST")
 	router.Handle("/walletRules", middleware.AuthMiddleware(http.HandlerFunc(app.getRules))).Methods("GET")
 
 	/* Wallet Payments */

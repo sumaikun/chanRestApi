@@ -889,6 +889,10 @@ func (app *Application) externalPayment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	cognito_email := context.Get(r, "cognito_email")
+
+	fmt.Printf("cognito_email", cognito_email)
+
 	externalPayment.Date = time.Now().String()
 
 	externalPayment.Identification = RandStringRunes(12)
