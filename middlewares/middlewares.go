@@ -1,11 +1,14 @@
 package middleware
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/dgrijalva/jwt-go"
 	"gopkg.in/mgo.v2/bson"
 
@@ -14,6 +17,10 @@ import (
 	Dao "github.com/sumaikun/apeslogistic-rest-api/dao"
 
 	"github.com/gorilla/context"
+
+	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+
+	Helpers "github.com/sumaikun/apeslogistic-rest-api/helpers"
 )
 
 var dao = Dao.MongoConnector{}
@@ -21,53 +28,103 @@ var dao = Dao.MongoConnector{}
 // AuthMiddleware verify
 func AuthMiddleware(next http.Handler) http.Handler {
 
-	cognitoChecking := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	fmt.Println()
+
+	var config = C.Config{}
+	config.Read()
+
+	var JwtKey = []byte(config.Jwtkey)
+
+	if len(JwtKey) == 0 {
+		log.Fatal("HTTP server unable to start, expected an APP_KEY for JWT auth")
+	}
+	jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
+		Extractor: jwtmiddleware.FromFirst(jwtmiddleware.FromAuthHeader,
+			jwtmiddleware.FromParameter("token")),
+		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+			return []byte(JwtKey), nil
+		},
+		SigningMethod: jwt.SigningMethodHS256,
+	})
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		cognito_email := context.Get(r, "cognito_email")
+
+		fmt.Printf("cognito_email", cognito_email)
+
+		if cognito_email == nil {
+			err := jwtMiddleware.CheckJWT(w, r)
+			if err != nil {
+				Helpers.RespondWithError(w, http.StatusUnauthorized, err.Error())
+				return
+			}
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+		return
+	})
+
+	//return jwtMiddleware.Handler(next)
+
+}
+
+// CognitoMiddleware verify
+func CognitoMiddleware(next http.Handler) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		at := r.Header.Get("Authorization")
 
+		fmt.Println("at", at)
+
 		ifContains := strings.Contains(at, "Bearer ")
 
-		if ifContains == true {
+		fmt.Println("ifContains", ifContains)
 
-			cognitoClient := cognito.GetUserInput{ AccessToken: at }
+		if ifContains == false {
 
-			err := cognitoClient.Validate()
+			fmt.Println("lets check cognito")
 
+			conf := &aws.Config{Region: aws.String("us-east-1")}
+
+			sess, err := session.NewSession(conf)
 			if err != nil {
-				fmt.Printf(err)
-				return false
+				Helpers.RespondWithError(w, http.StatusInternalServerError, err.Error())
+				return
 			}
 
-			//next.ServeHTTP(w, r)
-			return true
+			cognitoClient := cognito.New(sess)
+
+			userInput := cognito.GetUserInput{AccessToken: &at}
+
+			cognitoResponse, err2 := cognitoClient.GetUser(&userInput)
+
+			if err2 != nil {
+				Helpers.RespondWithError(w, http.StatusUnauthorized, err2.Error())
+				return
+			}
+
+			fmt.Println("cognitoResponse", cognitoResponse.UserAttributes)
+
+			for _, s := range cognitoResponse.UserAttributes {
+				//fmt.Println(i, s)
+				if *s.Name == "email" {
+					context.Set(r, "cognito_email", s.Value)
+				}
+			}
+
+			next.ServeHTTP(w, r)
+			return
 
 		}
 
-		return false
-	}
+		next.ServeHTTP(w, r)
+		return
 
-	if cognitoChecking == false {
-		var config = C.Config{}
-		config.Read()
-
-		var JwtKey = []byte(config.Jwtkey)
-
-		if len(JwtKey) == 0 {
-			log.Fatal("HTTP server unable to start, expected an APP_KEY for JWT auth")
-		}
-		jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
-			Extractor: jwtmiddleware.FromFirst(jwtmiddleware.FromAuthHeader,
-				jwtmiddleware.FromParameter("token")),
-			ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-				return []byte(JwtKey), nil
-			},
-			SigningMethod: jwt.SigningMethodHS256,
-		})
-		return jwtMiddleware.Handler(next)
-	}
-
-	return next.ServeHTTP(w, r)
-	
+	})
 
 }
 

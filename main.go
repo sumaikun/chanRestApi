@@ -175,11 +175,11 @@ func main() {
 
 	/* Owners */
 	router.Handle("/walletOwners", middleware.AuthMiddleware(http.HandlerFunc(app.saveOwner))).Methods("POST")
-	router.Handle("/walletOwners", middleware.AuthMiddleware(http.HandlerFunc(app.getOwners))).Methods("GET")
+	router.Handle("/walletOwners", middleware.CognitoMiddleware(middleware.AuthMiddleware(http.HandlerFunc(app.getOwners)))).Methods("GET")
 
 	/* External Agents */
 	router.Handle("/walletExternalAgents", middleware.AuthMiddleware(http.HandlerFunc(app.saveExternalAgent))).Methods("POST")
-	router.Handle("/walletExternalAgents", middleware.AuthMiddleware(http.HandlerFunc(app.getExternalAgents))).Methods("GET")
+	router.Handle("/walletExternalAgents", middleware.CognitoMiddleware(middleware.AuthMiddleware(http.HandlerFunc(app.getExternalAgents)))).Methods("GET")
 
 	/* Wallets Events */
 	router.Handle("/walletEvents", middleware.AuthMiddleware(http.HandlerFunc(app.saveEvent))).Methods("POST")

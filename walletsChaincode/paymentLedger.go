@@ -401,7 +401,7 @@ func (t *ApesWallet) makeWalletPayment(stub shim.ChaincodeStubInterface, args []
 		updateToOwner.Balance = updateToOwner.Balance + remainQuantity
 	}
 
-	walletPayment := &WalletPayment{"walletPayment", fromWallet, toWallet, "failed", date, quantity, identification}
+	walletPayment := &WalletPayment{"walletPayment", fromWallet, toWallet, "success", date, quantity, identification}
 	walletPaymentJSONasBytes, err := json.Marshal(walletPayment)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -509,169 +509,173 @@ func checkEventsAndRules(stub shim.ChaincodeStubInterface, eventKey string, proc
 		rule := Rule{}
 		_ = json.Unmarshal(valAsbytes, &rule)
 
-		var quantityToreduce int
+		if rule.State == true {
 
-		if rule.Fee > 0 {
+			var quantityToreduce int
 
-			fmt.Println("fee", rule.Fee)
+			if rule.Fee > 0 {
 
-			var percent float32
+				fmt.Println("fee", rule.Fee)
 
-			percent = (float32(rule.Fee) / 100)
+				var percent float32
 
-			fmt.Println("percent: ", percent)
+				percent = (float32(rule.Fee) / 100)
 
-			quantityToreduceFloat := float32(rulesQuantity) * percent
+				fmt.Println("percent: ", percent)
 
-			quantityToreduce = int(quantityToreduceFloat)
+				quantityToreduceFloat := float32(rulesQuantity) * percent
 
-			//fmt.Println("quantityToreduce prev: "string(quantityToreduce))
+				quantityToreduce = int(quantityToreduceFloat)
 
-			if quantityToreduce > processQuantity {
-				deferError = errors.New("Not  enought fonds for this rule " + rule.Identification)
+				//fmt.Println("quantityToreduce prev: "string(quantityToreduce))
 
-				return 0, errors.New("Not  enought fonds for this rule " + rule.Identification)
-			}
+				if quantityToreduce > processQuantity {
+					deferError = errors.New("Not  enought fonds for this rule " + rule.Identification)
 
-		} else {
-			if rule.Quantity > processQuantity {
-				deferError = errors.New("Not  enought fonds for this rule " + rule.Identification)
-
-				return 0, errors.New("Not  enought fonds for this rule " + rule.Identification)
-			}
-			quantityToreduce = rule.Quantity
-		}
-
-		fmt.Println("quantityToreduce: ", quantityToreduce)
-
-		if len(rule.ToExternal) > 0 {
-
-			identification := RandStringRunes(12)
-
-			externalPayment := ExternalPayment{"externalPayment", rule.ToExternal, walletID, "ruleExecution", time.Now().String(), quantityToreduce, "DISCOUNT", identification}
-
-			externalPaymentJSONasBytes, err := json.Marshal(externalPayment)
-			if err != nil {
-				return 0, err
-			}
-
-			//deferError
-
-			defer1 := func(stub shim.ChaincodeStubInterface, identification string, externalPaymentJSONasBytes []byte, rule Rule, walletID string) (int, error) {
-
-				if deferError == nil {
-
-					err = stub.PutState(identification, externalPaymentJSONasBytes)
-					if err != nil {
-						return 0, err
-					}
-					indexName := "type~identification"
-					typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{"externalPayment", identification})
-					if err != nil {
-						return 0, err
-					}
-					value := []byte{0x00}
-					stub.PutState(typeIndexKey, value)
-
-					indexName = "wallet~externalPayment"
-					typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{walletID, identification})
-					if err != nil {
-						return 0, err
-					}
-					value = []byte{0x00}
-					stub.PutState(typeIndexKey, value)
-
-					indexName = "externalAgent~externalPayment"
-					typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{rule.ToExternal, identification})
-					if err != nil {
-						return 0, err
-					}
-					value = []byte{0x00}
-					stub.PutState(typeIndexKey, value)
+					return 0, errors.New("Not  enought fonds for this rule " + rule.Identification)
 				}
 
-				return 0, nil
+			} else {
+				if rule.Quantity > processQuantity {
+					deferError = errors.New("Not  enought fonds for this rule " + rule.Identification)
 
+					return 0, errors.New("Not  enought fonds for this rule " + rule.Identification)
+				}
+				quantityToreduce = rule.Quantity
 			}
-			defer defer1(stub, identification, externalPaymentJSONasBytes, rule, walletID)
 
-		}
+			fmt.Println("quantityToreduce: ", quantityToreduce)
 
-		if len(rule.ToWallet) > 0 {
+			if len(rule.ToExternal) > 0 {
 
-			identification := RandStringRunes(12)
+				identification := RandStringRunes(12)
 
-			defer2 := func(stub shim.ChaincodeStubInterface, rule Rule, identification string, quantityToreduce int, walletID string) (int, error) {
+				externalPayment := ExternalPayment{"externalPayment", rule.ToExternal, walletID, "ruleExecution", time.Now().String(), quantityToreduce, "DISCOUNT", identification}
 
-				if deferError == nil {
-
-					toWalletAsBytes, err := stub.GetState(rule.ToWallet)
-					if err != nil {
-						return 0, err
-					} else if toWalletAsBytes == nil {
-						return 0, errors.New("Rule not exist but registered on composite keys")
-					}
-
-					updateToOwner := Owner{}
-					_ = json.Unmarshal(toWalletAsBytes, &updateToOwner)
-
-					walletPayment := WalletPayment{"walletPayment", walletID, rule.ToWallet, "ruleExecution", time.Now().String(), quantityToreduce, identification}
-
-					walletPaymentJSONasBytes, err := json.Marshal(walletPayment)
-					if err != nil {
-						return 0, err
-					}
-
-					err = stub.PutState(identification, walletPaymentJSONasBytes)
-					if err != nil {
-						return 0, err
-					}
-
-					updateToOwner.Balance = updateToOwner.Balance + quantityToreduce
-
-					updateToOwnerJSONasBytes, err := json.Marshal(updateToOwner)
-					if err != nil {
-						return 0, err
-					}
-
-					err = stub.PutState(updateToOwner.Identification, updateToOwnerJSONasBytes)
-					if err != nil {
-						return 0, err
-					}
-
-					indexName := "type~identification"
-					typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{"walletPayment", identification})
-					if err != nil {
-						return 0, err
-					}
-					value := []byte{0x00}
-					defer stub.PutState(typeIndexKey, value)
-
-					indexName = "fromWallet~walletPayment"
-					typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{walletID, identification})
-					if err != nil {
-						return 0, err
-					}
-					value = []byte{0x00}
-					stub.PutState(typeIndexKey, value)
-
-					indexName = "toWallet~walletPayment"
-					typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{updateToOwner.Identification, identification})
-					if err != nil {
-						return 0, err
-					}
-					value = []byte{0x00}
-					stub.PutState(typeIndexKey, value)
+				externalPaymentJSONasBytes, err := json.Marshal(externalPayment)
+				if err != nil {
+					return 0, err
 				}
 
-				return 0, nil
+				//deferError
+
+				defer1 := func(stub shim.ChaincodeStubInterface, identification string, externalPaymentJSONasBytes []byte, rule Rule, walletID string) (int, error) {
+
+					if deferError == nil {
+
+						err = stub.PutState(identification, externalPaymentJSONasBytes)
+						if err != nil {
+							return 0, err
+						}
+						indexName := "type~identification"
+						typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{"externalPayment", identification})
+						if err != nil {
+							return 0, err
+						}
+						value := []byte{0x00}
+						stub.PutState(typeIndexKey, value)
+
+						indexName = "wallet~externalPayment"
+						typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{walletID, identification})
+						if err != nil {
+							return 0, err
+						}
+						value = []byte{0x00}
+						stub.PutState(typeIndexKey, value)
+
+						indexName = "externalAgent~externalPayment"
+						typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{rule.ToExternal, identification})
+						if err != nil {
+							return 0, err
+						}
+						value = []byte{0x00}
+						stub.PutState(typeIndexKey, value)
+					}
+
+					return 0, nil
+
+				}
+				defer defer1(stub, identification, externalPaymentJSONasBytes, rule, walletID)
+
 			}
 
-			go defer2(stub, rule, identification, quantityToreduce, walletID)
+			if len(rule.ToWallet) > 0 {
+
+				identification := RandStringRunes(12)
+
+				defer2 := func(stub shim.ChaincodeStubInterface, rule Rule, identification string, quantityToreduce int, walletID string) (int, error) {
+
+					if deferError == nil {
+
+						toWalletAsBytes, err := stub.GetState(rule.ToWallet)
+						if err != nil {
+							return 0, err
+						} else if toWalletAsBytes == nil {
+							return 0, errors.New("Rule not exist but registered on composite keys")
+						}
+
+						updateToOwner := Owner{}
+						_ = json.Unmarshal(toWalletAsBytes, &updateToOwner)
+
+						walletPayment := WalletPayment{"walletPayment", walletID, rule.ToWallet, "ruleExecution", time.Now().String(), quantityToreduce, identification}
+
+						walletPaymentJSONasBytes, err := json.Marshal(walletPayment)
+						if err != nil {
+							return 0, err
+						}
+
+						err = stub.PutState(identification, walletPaymentJSONasBytes)
+						if err != nil {
+							return 0, err
+						}
+
+						updateToOwner.Balance = updateToOwner.Balance + quantityToreduce
+
+						updateToOwnerJSONasBytes, err := json.Marshal(updateToOwner)
+						if err != nil {
+							return 0, err
+						}
+
+						err = stub.PutState(updateToOwner.Identification, updateToOwnerJSONasBytes)
+						if err != nil {
+							return 0, err
+						}
+
+						indexName := "type~identification"
+						typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{"walletPayment", identification})
+						if err != nil {
+							return 0, err
+						}
+						value := []byte{0x00}
+						defer stub.PutState(typeIndexKey, value)
+
+						indexName = "fromWallet~walletPayment"
+						typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{walletID, identification})
+						if err != nil {
+							return 0, err
+						}
+						value = []byte{0x00}
+						stub.PutState(typeIndexKey, value)
+
+						indexName = "toWallet~walletPayment"
+						typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{updateToOwner.Identification, identification})
+						if err != nil {
+							return 0, err
+						}
+						value = []byte{0x00}
+						stub.PutState(typeIndexKey, value)
+					}
+
+					return 0, nil
+				}
+
+				go defer2(stub, rule, identification, quantityToreduce, walletID)
+
+			}
+
+			processQuantity = processQuantity - quantityToreduce
 
 		}
-
-		processQuantity = processQuantity - quantityToreduce
 
 	}
 
