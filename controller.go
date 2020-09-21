@@ -769,6 +769,10 @@ func (app *Application) saveExternalAgent(w http.ResponseWriter, r *http.Request
 
 func (app *Application) getExternalAgents(w http.ResponseWriter, r *http.Request) {
 
+	cognito_email := context.Get(r, "cognito_email")
+
+	fmt.Printf("cognito_email", cognito_email)
+
 	response, err := app.Fabric.QueryObjectType2("externalAgent")
 	if err != nil {
 		fmt.Printf("Unable to query  the chaincode: %v\n", err)
