@@ -241,7 +241,7 @@ func (app *Application) CreateWalletIfNotExist(next http.Handler) http.Handler {
 				if strings.Contains(err.Error(), "Key does not exist") {
 					fmt.Println("key does not exist then create")
 
-					_, err2 := app.Fabric.SaveOwner(models.Owner{"owner", *cognitoEmailParsed, "", "", "", *cognitoEmailParsed, *cognitoEmailParsed, "", "", 1})
+					_, err2 := app.Fabric.SaveOwner(models.Owner{"owner", *cognitoEmailParsed, "colombia", "no definida", *cognitoEmailParsed, *cognitoEmailParsed, *cognitoEmailParsed, "", "", 1})
 					if err2 != nil {
 						fmt.Printf("Unable to save owner on the chaincode: %v\n", err2)
 						Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
