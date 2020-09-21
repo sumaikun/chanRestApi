@@ -1132,7 +1132,7 @@ func (app *Application) fromWalletWalletPaymentWithToken(w http.ResponseWriter, 
 
 	cognitoEmailParsed := cognitoEmail.(*string)
 
-	fmt.Println("cognitoEmailParsed", v)
+	fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
 
 	response, err := app.Fabric.QueryByType2("fromWallet~walletPayment", *cognitoEmailParsed)
 	if err != nil {
@@ -1163,7 +1163,7 @@ func (app *Application) toWalletWalletPaymentWithToken(w http.ResponseWriter, r 
 
 	cognitoEmailParsed := cognitoEmail.(*string)
 
-	fmt.Println("cognitoEmailParsed", v)
+	fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
 
 	response, err := app.Fabric.QueryByType2("toWallet~walletPayment", *cognitoEmailParsed)
 	if err != nil {
