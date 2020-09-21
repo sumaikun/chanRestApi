@@ -769,9 +769,13 @@ func (app *Application) saveExternalAgent(w http.ResponseWriter, r *http.Request
 
 func (app *Application) getExternalAgents(w http.ResponseWriter, r *http.Request) {
 
-	cognito_email := context.Get(r, "cognito_email")
+	cognitoEmail := context.Get(r, "cognito_email")
 
-	fmt.Printf("cognito_email", cognito_email)
+	fmt.Printf("cognitoEmail", cognitoEmail)
+
+	cognitoEmailParsed := cognitoEmail.(bson.M)
+
+	fmt.Printf("cognitoEmailParsed", cognitoEmailParsed)
 
 	response, err := app.Fabric.QueryObjectType2("externalAgent")
 	if err != nil {
