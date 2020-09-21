@@ -8,10 +8,12 @@ import (
 	"os"
 
 	//"github.com/chainHero/heroes-service/blockchain"
+	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/sumaikun/apeslogistic-rest-api/blockchain"
 	Config "github.com/sumaikun/apeslogistic-rest-api/config"
 	Dao "github.com/sumaikun/apeslogistic-rest-api/dao"
+	Helpers "github.com/sumaikun/apeslogistic-rest-api/helpers"
 	middleware "github.com/sumaikun/apeslogistic-rest-api/middlewares"
 	"github.com/thedevsaddam/govalidator"
 )
@@ -179,7 +181,7 @@ func main() {
 
 	/* External Agents */
 	router.Handle("/walletExternalAgents", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.saveExternalAgent))))).Methods("POST")
-	router.Handle("/walletExternalAgents", middleware.CognitoMiddleware(middleware.AuthMiddleware(middleware.CreateWalletIfNotExist(http.HandlerFunc(app.getExternalAgents))))).Methods("GET")
+	router.Handle("/walletExternalAgents", middleware.CognitoMiddleware(middleware.AuthMiddleware(CreateWalletIfNotExist(http.HandlerFunc(app.getExternalAgents))))).Methods("GET")
 
 	/* Wallets Events */
 	router.Handle("/walletEvents", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.saveEvent))))).Methods("POST")
@@ -216,4 +218,34 @@ func RandStringRunes(n int) string {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
 	return string(b)
+}
+
+// CreateWalletIfNotExist Verify Wallet Existence
+func CreateWalletIfNotExist(next http.Handler) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		cognitoEmail := context.Get(r, "cognito_email")
+
+		if cognitoEmail != nil {
+			cognitoEmailParsed := cognitoEmail.(*string)
+
+			fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+			response, err := app.Fabric.QueryGetData2(*cognitoEmailParsed)
+			if err != nil {
+				fmt.Printf("Unable to query  the chaincode: %v\n", err)
+				Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+				return
+			}
+
+			fmt.Print("Response from chaincode: %s\n", response)
+
+			next.ServeHTTP(w, r)
+		}
+
+		Helpers.RespondWithJSON(w, http.StatusUnauthorized, map[string]string{"error": "wallet not exist"})
+		return
+
+	})
 }
