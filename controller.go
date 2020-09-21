@@ -958,6 +958,7 @@ func (app *Application) walletExternalPayment(w http.ResponseWriter, r *http.Req
 
 	if len(params["key"]) == 0 {
 		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+		return
 	}
 
 	response, err := app.Fabric.QueryByType2("wallet~externalPayment", params["key"])
@@ -985,6 +986,7 @@ func (app *Application) externalAgentExternalPayment(w http.ResponseWriter, r *h
 
 	if len(params["key"]) == 0 {
 		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+		return
 	}
 
 	response, err := app.Fabric.QueryByType2("externalAgent~externalPayment", params["key"])
@@ -1012,6 +1014,7 @@ func (app *Application) fromWalletWalletPayment(w http.ResponseWriter, r *http.R
 
 	if len(params["key"]) == 0 {
 		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+		return
 	}
 
 	response, err := app.Fabric.QueryByType2("fromWallet~walletPayment", params["key"])
@@ -1039,6 +1042,7 @@ func (app *Application) toWalletWalletPayment(w http.ResponseWriter, r *http.Req
 
 	if len(params["key"]) == 0 {
 		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+		return
 	}
 
 	response, err := app.Fabric.QueryByType2("toWallet~walletPayment", params["key"])
@@ -1066,6 +1070,7 @@ func (app *Application) walletExternalPaymentWithToken(w http.ResponseWriter, r 
 
 	if cognitoEmail == nil {
 		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+		return
 	}
 
 	cognitoEmailParsed := cognitoEmail.(*string)
@@ -1097,6 +1102,7 @@ func (app *Application) externalAgentExternalPaymentWithToken(w http.ResponseWri
 
 	if cognitoEmail == nil {
 		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+		return
 	}
 
 	cognitoEmailParsed := cognitoEmail.(*string)
@@ -1128,6 +1134,7 @@ func (app *Application) fromWalletWalletPaymentWithToken(w http.ResponseWriter, 
 
 	if cognitoEmail == nil {
 		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+		return
 	}
 
 	cognitoEmailParsed := cognitoEmail.(*string)
@@ -1159,6 +1166,7 @@ func (app *Application) toWalletWalletPaymentWithToken(w http.ResponseWriter, r 
 
 	if cognitoEmail == nil {
 		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+		return
 	}
 
 	cognitoEmailParsed := cognitoEmail.(*string)
