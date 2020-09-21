@@ -221,7 +221,7 @@ func RandStringRunes(n int) string {
 }
 
 // CreateWalletIfNotExist Verify Wallet Existence
-func CreateWalletIfNotExist(next http.Handler) http.Handler {
+func (app *Application) CreateWalletIfNotExist(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 

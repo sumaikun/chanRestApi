@@ -170,7 +170,7 @@ func UserMiddleware(next http.Handler) http.Handler {
 }
 
 // OnlyAdminMiddleware can execute request if is admin
-func (app *Application) OnlyAdminMiddleware(next http.Handler) http.Handler {
+func OnlyAdminMiddleware(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
