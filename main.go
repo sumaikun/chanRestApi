@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 
 	//"github.com/chainHero/heroes-service/blockchain"
 	"github.com/gorilla/context"
@@ -235,11 +236,16 @@ func (app *Application) CreateWalletIfNotExist(next http.Handler) http.Handler {
 			response, err := app.Fabric.QueryGetData2(*cognitoEmailParsed)
 			if err != nil {
 				fmt.Printf("Unable to query  the chaincode: %v\n", err)
+
+				if strings.Contains(err.Error(), "Key does not exist") {
+					fmt.Println("key does not exist then create")
+				}
+
 				Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
 				return
 			}
 
-			fmt.Print("Response from chaincode: %s\n", response)
+			fmt.Println("Response from chaincode: %s\n", response)
 
 			next.ServeHTTP(w, r)
 		}
