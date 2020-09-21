@@ -16,6 +16,7 @@ import (
 	Dao "github.com/sumaikun/apeslogistic-rest-api/dao"
 	Helpers "github.com/sumaikun/apeslogistic-rest-api/helpers"
 	middleware "github.com/sumaikun/apeslogistic-rest-api/middlewares"
+	"github.com/sumaikun/apeslogistic-rest-api/models"
 	"github.com/thedevsaddam/govalidator"
 )
 
@@ -239,6 +240,17 @@ func (app *Application) CreateWalletIfNotExist(next http.Handler) http.Handler {
 
 				if strings.Contains(err.Error(), "Key does not exist") {
 					fmt.Println("key does not exist then create")
+
+					txID, err2 := app.Fabric.SaveOwner(models.Owner{"owner", *cognitoEmailParsed, "", "", "", *cognitoEmailParsed, *cognitoEmailParsed, "", "", 1})
+					if err2 != nil {
+						fmt.Printf("Unable to save owner on the chaincode: %v\n", err2)
+						Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+						return
+					}
+
+					next.ServeHTTP(w, r)
+
+					return
 				}
 
 				Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
@@ -248,6 +260,8 @@ func (app *Application) CreateWalletIfNotExist(next http.Handler) http.Handler {
 			fmt.Println("Response from chaincode: %s\n", response)
 
 			next.ServeHTTP(w, r)
+
+			return
 		}
 
 		Helpers.RespondWithJSON(w, http.StatusUnauthorized, map[string]string{"error": "wallet not exist"})
