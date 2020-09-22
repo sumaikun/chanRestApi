@@ -14,10 +14,10 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 	fmt.Println("########### ApesWallet create Owner ###########")
 	var err error
 
-	// 0 ,    1,           2,       3,     4,             5,        6      7
-	// name,  nationality, address, phone, identification, photoUrl, notes, balance
+	// 0 ,    1,           2,       3,     4,             5,        6		7
+	// name,  nationality, address, phone, email, identification, photoUrl, notes,
 
-	if len(args) != 7 {
+	if len(args) != 8 {
 		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
@@ -38,6 +38,10 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 	}
 
 	if len(args[4]) <= 0 {
+		return shim.Error("email argument must be a non-empty string")
+	}
+
+	if len(args[5]) <= 0 {
 		return shim.Error("identification argument must be a non-empty string")
 	}
 
@@ -45,7 +49,9 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 
 	address := strings.ToLower(args[2])
 
-	identification := strings.ToLower(args[4])
+	identification := string(args[5])
+
+	email := strings.ToLower(args[4])
 
 	nationality := strings.ToLower(args[1])
 
@@ -67,7 +73,7 @@ func (t *ApesWallet) saveOwner(stub shim.ChaincodeStubInterface, args []string) 
 		//return shim.Error("This owner already exists: " + identification)
 	}
 
-	owner := &Owner{objectType, name, nationality, address, phone, identification, photoURL, notes}
+	owner := &Owner{objectType, name, nationality, address, phone, email, identification, photoURL, notes, balance}
 	ownerJSONasBytes, err := json.Marshal(owner)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -103,7 +109,7 @@ func (t *ApesWallet) saveExternalAgent(stub shim.ChaincodeStubInterface, args []
 	// 0 ,    1,          2
 	// name,  description, identification
 
-	if len(args) != 2 {
+	if len(args) != 3 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")
 	}
 
@@ -123,7 +129,7 @@ func (t *ApesWallet) saveExternalAgent(stub shim.ChaincodeStubInterface, args []
 
 	description := strings.ToLower(args[1])
 
-	identification := strings.ToLower(args[2])
+	identification := string(args[2])
 
 	objectType := "externalAgent"
 
@@ -225,7 +231,7 @@ func (t *ApesWallet) saveEvent(stub shim.ChaincodeStubInterface, args []string) 
 		//return shim.Error("This externalAgent already exists: " + identification)
 	}
 
-	event := &Event{objectType, name, description, identification}
+	event := &Event{objectType, fromExternal, fromWallet, toWallet, toExternal, keyEvent}
 	eventJSONasBytes, err := json.Marshal(event)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -258,8 +264,8 @@ func (t *ApesWallet) saveRule(stub shim.ChaincodeStubInterface, args []string) p
 	// 0,        1,     2,       3,       4,    5,       6
 	// event, fee, toWallet, toExternal, date, quantity, state
 
-	if len(args) != 6 {
-		return shim.Error("Incorrect number of arguments. Expecting 5")
+	if len(args) != 7 {
+		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
 	if len(args[2]) > 0 && len(args[3]) > 0 {
@@ -270,7 +276,7 @@ func (t *ApesWallet) saveRule(stub shim.ChaincodeStubInterface, args []string) p
 		return shim.Error("must give  an external argent or a wallet for an output rule")
 	}
 
-	if len(args[1]) > 0 && len(args[5]) > 0 {
+	if len(args[1]) > 1 && len(args[5]) > 1 {
 		return shim.Error("its only valid  a fee or a quantity for output rule")
 	}
 
@@ -327,7 +333,7 @@ func (t *ApesWallet) saveRule(stub shim.ChaincodeStubInterface, args []string) p
 		keyRule = event + "-rule-" + toExternal
 	}
 
-	ruleAsBytes, err := stub.GetState(keyEvent)
+	ruleAsBytes, err := stub.GetState(keyRule)
 
 	if err != nil {
 		return shim.Error("Failed to get rule: " + err.Error())
@@ -336,7 +342,7 @@ func (t *ApesWallet) saveRule(stub shim.ChaincodeStubInterface, args []string) p
 		//return shim.Error("This externalAgent already exists: " + identification)
 	}
 
-	rule := &Rule{objectType, event, fee, toWallet, toExternal, date, quantity, state}
+	rule := &Rule{objectType, event, fee, toWallet, toExternal, date, quantity, state, keyRule}
 
 	ruleJSONasBytes, err := json.Marshal(rule)
 	if err != nil {
@@ -362,12 +368,12 @@ func (t *ApesWallet) saveRule(stub shim.ChaincodeStubInterface, args []string) p
 	value := []byte{0x00}
 	stub.PutState(typeIndexKey, value)
 
-	indexName := "event~rule"
-	typeIndexKey, err := stub.CreateCompositeKey(indexName, []string{event, keyRule})
+	indexName = "event~rule"
+	typeIndexKey, err = stub.CreateCompositeKey(indexName, []string{event, keyRule})
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	value := []byte{0x00}
+	value = []byte{0x00}
 	stub.PutState(typeIndexKey, value)
 
 	return shim.Success(nil)

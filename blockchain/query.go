@@ -56,3 +56,57 @@ func (setup *FabricSetup) QueryObjectType(key string) ([]byte, error) {
 
 	return response.Payload, nil
 }
+
+//--------------------------------------------------- wallet driver -------------------------------------------------------------------//
+
+// QueryGetData2 query the chaincode to get the state of a key
+func (setup *FabricSetup) QueryGetData2(key string) ([]byte, error) {
+
+	// Prepare arguments
+	var args []string
+	args = append(args, "getData")
+	args = append(args, key)
+
+	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID2, Fcn: args[0], Args: [][]byte{[]byte(args[1])}})
+	if err != nil {
+		fmt.Errorf("failed to query: %v", err)
+		return nil, err
+	}
+
+	return response.Payload, nil
+}
+
+// QueryObjectType2 query the chaincode to get the state of a key
+func (setup *FabricSetup) QueryObjectType2(objectType string) ([]byte, error) {
+
+	// Prepare arguments
+	var args []string
+	args = append(args, "getObjectTypeWithKey")
+	args = append(args, objectType)
+
+	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID2, Fcn: args[0], Args: [][]byte{[]byte(args[1])}})
+	if err != nil {
+		fmt.Errorf("failed to query: %v", err)
+		return nil, err
+	}
+
+	return response.Payload, nil
+}
+
+//QueryByType2 use query with composite keys on a dynamic way
+func (setup *FabricSetup) QueryByType2(key string, objectType string) ([]byte, error) {
+
+	// Prepare arguments
+	var args []string
+	args = append(args, "getObjectTypeByKey")
+	args = append(args, key)
+	args = append(args, objectType)
+
+	response, err := setup.client.Query(channel.Request{ChaincodeID: setup.ChainCodeID2, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2])}})
+	if err != nil {
+		fmt.Errorf("failed to query: %v", err)
+		return nil, err
+	}
+
+	return response.Payload, nil
+}

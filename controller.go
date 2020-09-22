@@ -616,7 +616,7 @@ func (app *Application) getAssets(w http.ResponseWriter, r *http.Request) {
 
 //------------------------ Fabric infraestricture services
 
-/*func (app *Application) installChainCode(w http.ResponseWriter, r *http.Request) {
+func (app *Application) installChainCode(w http.ResponseWriter, r *http.Request) {
 	err := app.Fabric.InstallAndInstantiateCC()
 	if err != nil {
 		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
@@ -636,4 +636,558 @@ func (app *Application) instantiateChainCode(w http.ResponseWriter, r *http.Requ
 
 	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "chaincode instantiated"})
 	return
-}*/
+}
+
+//---------------------------  Wallet Chaincode ---------------------------- //
+
+func (app *Application) getDataFromChaincode2(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+	}
+
+	defer r.Body.Close()
+
+	response, err := app.Fabric.QueryGetData2(params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	/*out, err := json.Marshal(response)
+	if err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}*/
+
+	var raw map[string]interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) getHistoryForKey2(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+	}
+
+	response, err := app.Fabric.HistoryKey2(params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) saveOwner(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, owner := ownerValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.SaveOwner(owner)
+	if err2 != nil {
+		fmt.Printf("Unable to save owner on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save owner transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) getOwners(w http.ResponseWriter, r *http.Request) {
+
+	response, err := app.Fabric.QueryObjectType2("owner")
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) saveExternalAgent(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, externalAgent := externalAgentValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.SaveExternalAgent(externalAgent)
+	if err2 != nil {
+		fmt.Printf("Unable to save external agent on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save external agent transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) getExternalAgents(w http.ResponseWriter, r *http.Request) {
+
+	response, err := app.Fabric.QueryObjectType2("externalAgent")
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) saveEvent(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, event := eventValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.SaveEvent(event)
+	if err2 != nil {
+		fmt.Printf("Unable to save event on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save event transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) getEvents(w http.ResponseWriter, r *http.Request) {
+
+	response, err := app.Fabric.QueryObjectType2("event")
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) saveRule(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, rule := rulesValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	rule.Date = time.Now().String()
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.SaveRule(rule)
+	if err2 != nil {
+		fmt.Printf("Unable to save rule on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save rule transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) getRules(w http.ResponseWriter, r *http.Request) {
+
+	response, err := app.Fabric.QueryObjectType2("rule")
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) externalPayment(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, externalPayment := externalPaymentValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail != nil {
+		cognitoEmailParsed := cognitoEmail.(*string)
+
+		fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+		externalPayment.ToWallet = *cognitoEmailParsed
+	}
+
+	externalPayment.Date = time.Now().String()
+
+	externalPayment.Identification = RandStringRunes(12)
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.ExternalPayment(externalPayment)
+	if err2 != nil {
+		fmt.Printf("Unable to save externalPayment on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save externalPayment transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) walletPayment(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	err, walletPayment := walletPaymentValidator(r)
+
+	if len(err["validationError"].(url.Values)) > 0 {
+		//fmt.Println(len(e))
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, err)
+		return
+	}
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail != nil {
+		cognitoEmailParsed := cognitoEmail.(*string)
+
+		fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+		walletPayment.FromWallet = *cognitoEmailParsed
+	}
+
+	walletPayment.Date = time.Now().String()
+
+	walletPayment.Identification = RandStringRunes(12)
+
+	// Invoke the chaincode
+	txID, err2 := app.Fabric.WalletPayment(walletPayment)
+	if err2 != nil {
+		fmt.Printf("Unable to save walletPayment on the chaincode: %v\n", err2)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+		return
+	}
+	fmt.Printf("Successfully save walletPayment transaction ID: %s\n", txID)
+	Helpers.RespondWithJSON(w, http.StatusOK, map[string]string{"result": txID})
+
+}
+
+func (app *Application) walletExternalPayment(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+		return
+	}
+
+	response, err := app.Fabric.QueryByType2("wallet~externalPayment", params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) externalAgentExternalPayment(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+		return
+	}
+
+	response, err := app.Fabric.QueryByType2("externalAgent~externalPayment", params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) fromWalletWalletPayment(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+		return
+	}
+
+	response, err := app.Fabric.QueryByType2("fromWallet~walletPayment", params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) toWalletWalletPayment(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	if len(params["key"]) == 0 {
+		Helpers.RespondWithJSON(w, http.StatusBadRequest, map[string]string{"result": "param key needed"})
+		return
+	}
+
+	response, err := app.Fabric.QueryByType2("toWallet~walletPayment", params["key"])
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) walletExternalPaymentWithToken(w http.ResponseWriter, r *http.Request) {
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail == nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+		return
+	}
+
+	cognitoEmailParsed := cognitoEmail.(*string)
+
+	fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+	response, err := app.Fabric.QueryByType2("wallet~externalPayment", *cognitoEmailParsed)
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) externalAgentExternalPaymentWithToken(w http.ResponseWriter, r *http.Request) {
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail == nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+		return
+	}
+
+	cognitoEmailParsed := cognitoEmail.(*string)
+
+	fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+	response, err := app.Fabric.QueryByType2("externalAgent~externalPayment", *cognitoEmailParsed)
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) fromWalletWalletPaymentWithToken(w http.ResponseWriter, r *http.Request) {
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail == nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+		return
+	}
+
+	cognitoEmailParsed := cognitoEmail.(*string)
+
+	fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+	response, err := app.Fabric.QueryByType2("fromWallet~walletPayment", *cognitoEmailParsed)
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}
+
+func (app *Application) toWalletWalletPaymentWithToken(w http.ResponseWriter, r *http.Request) {
+
+	cognitoEmail := context.Get(r, "cognito_email")
+
+	if cognitoEmail == nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": "Invalid Token"})
+		return
+	}
+
+	cognitoEmailParsed := cognitoEmail.(*string)
+
+	fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+	response, err := app.Fabric.QueryByType2("toWallet~walletPayment", *cognitoEmailParsed)
+	if err != nil {
+		fmt.Printf("Unable to query  the chaincode: %v\n", err)
+		Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Response from chaincode: %s\n", response)
+
+	var raw []interface{}
+	if err := json.Unmarshal(response, &raw); err != nil {
+		Helpers.RespondWithJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	Helpers.RespondWithJSON(w, http.StatusOK, raw)
+
+}

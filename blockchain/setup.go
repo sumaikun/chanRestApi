@@ -21,6 +21,7 @@ type FabricSetup struct {
 	OrdererID       string
 	ChannelID       string
 	ChainCodeID     string
+	ChainCodeID2    string
 	initialized     bool
 	ChannelConfig   string
 	ChaincodeGoPath string
@@ -36,13 +37,6 @@ type FabricSetup struct {
 
 // Initialize reads the configuration file and sets up the client, chain and event hub
 func (setup *FabricSetup) Initialize() error {
-
-	const (
-		channelID      = "apeschannel"
-		orgAdmin       = "Admin"
-		ordererOrgName = "OrdererMSP"
-		orgName        = "apes"
-	)
 
 	// Add parameters for the initialization
 	if setup.initialized {

@@ -3,14 +3,20 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"strings"
 
 	//"github.com/chainHero/heroes-service/blockchain"
+	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/sumaikun/apeslogistic-rest-api/blockchain"
 	Config "github.com/sumaikun/apeslogistic-rest-api/config"
 	Dao "github.com/sumaikun/apeslogistic-rest-api/dao"
+	Helpers "github.com/sumaikun/apeslogistic-rest-api/helpers"
 	middleware "github.com/sumaikun/apeslogistic-rest-api/middlewares"
+	"github.com/sumaikun/apeslogistic-rest-api/models"
+	"github.com/thedevsaddam/govalidator"
 )
 
 //Application object to chaincode connection
@@ -34,7 +40,8 @@ var fSetup = blockchain.FabricSetup{
 	//ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/sumaikun/apeslogistic-rest-api/fixtures/artifacts/apes-channel.tx",
 
 	// Chaincode parameters
-	ChainCodeID: "gocc1",
+	ChainCodeID:  "gocc1",
+	ChainCodeID2: "apes-wallet",
 	//ChaincodeGoPath: os.Getenv("GOPATH"),
 	//ChaincodePath:   "github.com/sumaikun/apeslogistic-rest-api/chaincode/",
 	OrgAdmin:   "Admin",
@@ -56,6 +63,16 @@ func init() {
 	dao.Server = config.Server
 	dao.Database = config.Database
 	dao.Connect()
+
+	govalidator.AddCustomRule("ifExist", func(field string, rule string, message string, value interface{}) error {
+
+		if len(value.(string)) >= 0 {
+			return nil
+		}
+
+		return fmt.Errorf("The %s field must exist", field)
+
+	})
 
 }
 
@@ -142,6 +159,42 @@ func main() {
 	router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.saveAsset))).Methods("POST")
 	router.Handle("/assets", middleware.AuthMiddleware(http.HandlerFunc(app.getAssets))).Methods("GET")
 
+	/*get data from  wallet chaincode */
+	router.HandleFunc("/getChaincodeData2/{key}", app.getDataFromChaincode2).Methods("GET")
+	router.Handle("/getHistoryForKey2/{key}", middleware.AuthMiddleware(http.HandlerFunc(app.getHistoryForKey2))).Methods("GET")
+
+	/* Owners */
+	router.Handle("/walletOwners", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.saveOwner))))).Methods("POST")
+	router.Handle("/walletOwners", middleware.CognitoMiddleware(middleware.AuthMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.getOwners))))).Methods("GET")
+
+	/* External Agents */
+	router.Handle("/walletExternalAgents", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.saveExternalAgent))))).Methods("POST")
+	router.Handle("/walletExternalAgents", middleware.CognitoMiddleware(middleware.AuthMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.getExternalAgents))))).Methods("GET")
+
+	/* Wallets Events */
+	router.Handle("/walletEvents", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.saveEvent))))).Methods("POST")
+	router.Handle("/walletEvents", middleware.AuthMiddleware(http.HandlerFunc(app.getEvents))).Methods("GET")
+
+	/* Wallets Rules */
+	router.Handle("/walletRules", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.saveRule))))).Methods("POST")
+	router.Handle("/walletRules", middleware.AuthMiddleware(http.HandlerFunc(app.getRules))).Methods("GET")
+
+	/* Wallet Payments */
+	router.Handle("/externalPayment", middleware.CognitoMiddleware(middleware.AuthMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.externalPayment))))).Methods("POST")
+	router.Handle("/walletPayment", middleware.CognitoMiddleware(middleware.AuthMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.walletPayment))))).Methods("POST")
+
+	/* Trazability with admin */
+	router.Handle("/walletExternalPayment/{key}", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.walletExternalPayment))))).Methods("GET")
+	router.Handle("/externalAgentExternalPayment/{key}", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.walletExternalPayment))))).Methods("GET")
+	router.Handle("/fromWalletWalletPayment/{key}", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.fromWalletWalletPayment))))).Methods("GET")
+	router.Handle("/toWalletWalletPayment/{key}", middleware.AuthMiddleware(middleware.UserMiddleware(middleware.OnlyAdminMiddleware(http.HandlerFunc(app.toWalletWalletPayment))))).Methods("GET")
+
+	/* Trazability by token */
+	router.Handle("/walletExternalPayment", middleware.CognitoMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.walletExternalPaymentWithToken)))).Methods("GET")
+	router.Handle("/externalAgentExternalPayment", middleware.CognitoMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.walletExternalPaymentWithToken)))).Methods("GET")
+	router.Handle("/fromWalletWalletPayment", middleware.CognitoMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.fromWalletWalletPaymentWithToken)))).Methods("GET")
+	router.Handle("/toWalletWalletPayment", middleware.CognitoMiddleware(app.CreateWalletIfNotExist(http.HandlerFunc(app.toWalletWalletPaymentWithToken)))).Methods("GET")
+
 	/* Infrastructure */
 	//router.Handle("/installChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.installChainCode))).Methods("POST")
 	//router.Handle("/instantiateChainCode", middleware.AuthMiddleware(http.HandlerFunc(app.instantiateChainCode))).Methods("GET")
@@ -155,4 +208,62 @@ func main() {
 	//start server
 	log.Fatal(http.ListenAndServe(":"+port, &CORSRouterDecorator{router}))
 
+}
+
+//RandStringRunes method
+func RandStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+// CreateWalletIfNotExist Verify Wallet Existence
+func (app *Application) CreateWalletIfNotExist(next http.Handler) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		cognitoEmail := context.Get(r, "cognito_email")
+
+		if cognitoEmail != nil {
+			cognitoEmailParsed := cognitoEmail.(*string)
+
+			fmt.Println("cognitoEmailParsed", *cognitoEmailParsed)
+
+			response, err := app.Fabric.QueryGetData2(*cognitoEmailParsed)
+			if err != nil {
+				fmt.Printf("Unable to query  the chaincode: %v\n", err)
+
+				if strings.Contains(err.Error(), "Key does not exist") {
+					fmt.Println("key does not exist then create")
+
+					_, err2 := app.Fabric.SaveOwner(models.Owner{"owner", *cognitoEmailParsed, "colombia", "no definida", *cognitoEmailParsed, *cognitoEmailParsed, *cognitoEmailParsed, "", "", 1})
+					if err2 != nil {
+						fmt.Printf("Unable to save owner on the chaincode: %v\n", err2)
+						Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err2.Error()})
+						return
+					}
+
+					next.ServeHTTP(w, r)
+
+					return
+				}
+
+				Helpers.RespondWithJSON(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+				return
+			}
+
+			fmt.Println("Response from chaincode: %s\n", response)
+
+			next.ServeHTTP(w, r)
+
+			return
+		}
+
+		next.ServeHTTP(w, r)
+
+		return
+
+	})
 }

@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 // ApesWallet implementation of Chaincode
 type ApesWallet struct {
@@ -18,10 +21,11 @@ type Owner struct {
 	Nationality    string `json:"nationality"`
 	Address        string `json:"address"`
 	Phone          string `json:"phone"`
+	Email          string `json:"email"`
 	Identification string `json:"identification"`
 	PhotoURL       string `json:"photoUrl"`
 	Notes          string `json:"notes"`
-	Balance        string `json:"balance"`
+	Balance        int    `json:"balance"`
 }
 
 // ExternalAgent representation in chaincode
@@ -35,19 +39,19 @@ type ExternalAgent struct {
 // WalletPayment representation in chaincode
 type WalletPayment struct {
 	ObjectType     string `json:"docType"`
-	FromWallet     string `json:"from"`
-	ToWallet       string `json:"to"`
+	FromWallet     string `json:"fromWallet"`
+	ToWallet       string `json:"toWallet"`
 	State          string `json:"state"`
 	Date           string `json:"date"`
-	Quantity       string `json:"quantity"`
+	Quantity       int    `json:"quantity"`
 	Identification string `json:"identification"`
 }
 
 // ExternalPayment representation in chaincode
 type ExternalPayment struct {
 	ObjectType     string `json:"docType"`
-	FromExternal   string `json:"from"`
-	ToWallet       string `json:"to"`
+	FromExternal   string `json:"fromExternal"`
+	ToWallet       string `json:"toWallet"`
 	State          string `json:"state"`
 	Date           string `json:"date"`
 	Quantity       int    `json:"quantity"`
@@ -57,30 +61,32 @@ type ExternalPayment struct {
 
 // Event representation in chaincode
 type Event struct {
-	ObjectType   string `json:"docType"`
-	fromExternal string `json:"fromExternal"`
-	fromWallet   string `json:"fromWallet"`
-	toWallet     string `json:"toWallet"`
-	toExternal   string `json:"toExternal"`
+	ObjectType     string `json:"docType"`
+	FromExternal   string `json:"fromExternal"`
+	FromWallet     string `json:"fromWallet"`
+	ToWallet       string `json:"toWallet"`
+	ToExternal     string `json:"toExternal"`
+	Identification string `json:"identification"`
 }
 
 // Rule representation in chaincode
 type Rule struct {
-	ObjectType string `json:"docType"`
-	Event      string `json:"event"`
-	fee        int    `json:"fee"`
-	ToWallet   string `json:"toWallet"`
-	toExternal string `json:"toAgent"`
-	Date       string `json:"date"`
-	Quantity   int    `json:"quantity"`
-	State      bool   `json:"state"`
+	ObjectType     string `json:"docType"`
+	Event          string `json:"event"`
+	Fee            int    `json:"fee"`
+	ToWallet       string `json:"toWallet"`
+	ToExternal     string `json:"toExternal"`
+	Date           string `json:"date"`
+	Quantity       int    `json:"quantity"`
+	State          bool   `json:"state"`
+	Identification string `json:"identification"`
 }
 
 // Init of the chaincode
 // This function is called only one when the chaincode is instantiated.
 // So the goal is to prepare the ledger to handle future requests.
-func (t *ApesChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	fmt.Println("########### ApesChainCode Init with changes ###########")
+func (t *ApesWallet) Init(stub shim.ChaincodeStubInterface) pb.Response {
+	fmt.Println("########### ApesWallet Init with changes ###########")
 
 	// Get the function and arguments from the request
 	function, _ := stub.GetFunctionAndParameters()
@@ -96,8 +102,8 @@ func (t *ApesChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
 
 // Invoke
 // All future requests named invoke will arrive here.
-func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
-	fmt.Println("########### ApesChainCode Invoke ###########")
+func (t *ApesWallet) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
+	fmt.Println("########### ApesWallet Invoke ###########")
 
 	// Get the function and arguments from the request
 	function, args := stub.GetFunctionAndParameters()
@@ -123,14 +129,14 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		return t.getData(stub, args)
 	}
 
-	// Get data result from objectType
-	if function == "getObjectType" {
-		return t.getObjectType(stub, args)
+	// getObjectTypeWithKey
+	if function == "getObjectTypeWithKey" {
+		return t.getObjectTypeWithKey(stub, args)
 	}
 
-	// saveOwner
-	if function == "getObjectType" {
-		return t.saveOwner(stub, args)
+	// getObjectTypeByKey
+	if function == "getObjectTypeByKey" {
+		return t.getObjectTypeByKey(stub, args)
 	}
 
 	// saveOwner
@@ -145,7 +151,7 @@ func (t *ApesChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 	// saveEvent
 	if function == "saveEvent" {
-		return t.saveEven(stub, args)
+		return t.saveEvent(stub, args)
 	}
 
 	// saveRule
@@ -183,4 +189,13 @@ func Contains(a []string, x string) bool {
 		}
 	}
 	return false
+}
+
+// RandStringRunes for generate random string
+func RandStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }
